@@ -1,0 +1,34 @@
+
+
+# -------------------------------------------------------------------------------------
+
+add_executable(ML_P3_deep_learning_Ch23_FFN Ch23_Feedforward_networks/feedforward_nn.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp)
+				
+target_link_libraries(ML_P3_deep_learning_Ch23_FFN ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P3_deep_learning_Ch23_FFN PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
+#add_executable(ML_P3_deep_learning_Ch24_tokenizer_example Ch24_CNN/tokenizer_example.cpp
+#	../../Utils/helpfunction.h
+#	../../Utils/helpfunction.cpp
+#	../../tokenizers/tokenizer.cpp 
+#	../../tokenizers/unilib/unicode.cpp 
+#	../../tokenizers/unilib//uninorms.cpp 
+#	)
+
+#if(Boost_FOUND)
+#    target_link_libraries(ML_P3_deep_learning_Ch24_tokenizer_example ${Boost_LIBRARIES})
+#endif()
+
+#set(unicode_dir "../../tokenizers/unilib") 
+
+#target_include_directories(ML_P3_deep_learning_Ch24_tokenizer_example PUBLIC ${unicode_dir})
+		
+#target_link_libraries(ML_P3_deep_learning_Ch24_tokenizer_example ${TORCH_LIBRARIES} matplot)
+#set_target_properties(ML_P3_deep_learning_Ch24_tokenizer_example PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
