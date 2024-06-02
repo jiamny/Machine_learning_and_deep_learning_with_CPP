@@ -7,6 +7,9 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <random>
+#include <limits.h>
+#include <cstdlib>
 
 /*
  * There is no way to change the precision via to_string() but the setprecision IO manipulator could be used instead:
@@ -118,6 +121,115 @@ std::vector<T> add_two_vectors(std::vector<T> const &a_vector,
 			});
 
 	return c_vector;
+}
+
+template<typename T>
+T RandT(T _min, T _max) {
+	T temp;
+	if(_min > _max ) {
+		temp = _min;
+		_min = _max;
+		_max = temp;
+	}
+	return( std::rand() / (double)RAND_MAX * (_max - _min) + _min );
+}
+
+
+template<typename T>
+std::vector<T> random_choice(int const outputSize, const std::vector<T> samples, bool replacement = true,
+								std::initializer_list<double> probabilities = {}) {
+
+	std::vector<T> output;
+
+	if(probabilities.size() > 0 ) {
+		assert(samples.size() == probabilities.size());
+		std::discrete_distribution<> distribution(probabilities);
+
+	    std::vector<decltype(distribution)::result_type> indices;
+	    indices.reserve(outputSize); // reserve to prevent reallocation
+	    // use a generator lambda to draw random indices based on distribution
+	    if( replacement ) {
+		    std::generate_n(back_inserter(indices), outputSize,
+		        [distribution = std::move(distribution), // could also capture by reference (&) or construct in the capture list
+		         generator = std::default_random_engine{}  //pseudo random. Fixed seed! Always same output.
+		        ]() mutable { // mutable required for generator
+		            return distribution(generator);
+		        });
+	    } else {
+        	auto generator = std::default_random_engine{};
+        	indices.clear();
+        	while( indices.size() < outputSize) {
+            	auto d = distribution(generator);
+
+            	std::vector<decltype(distribution)::result_type>::iterator it;
+            	it = std::find(indices.begin(), indices.end(), d);
+            	if(it == indices.end())
+            		indices.push_back(d);
+        	}
+	    }
+
+	    output.reserve(outputSize); // reserve to prevent reallocation
+	    std::transform(cbegin(indices), cend(indices),
+	        back_inserter(output),
+	        [&samples](auto const index) {
+	            return *std::next(cbegin(samples), index);
+	            // note, for std::vector or std::array of samples, you can use
+	            // return samples[index];
+	        });
+
+	} else {
+
+		std::vector<int> indices;
+		 if( replacement ) {
+			 for(auto& _ : range(outputSize, 0)) {
+				 int s_idx = RandT(0, static_cast<int>(samples.size() - 1));
+				 indices.push_back(s_idx);
+			 }
+		 } else {
+
+			 while(indices.size() < outputSize) {
+				 int d = RandT(0, static_cast<int>(samples.size() - 1));
+				 std::vector<int>::iterator it;
+				 it = std::find(indices.begin(), indices.end(), d);
+				 if(it == indices.end())
+					 indices.push_back(d);
+			 }
+		 }
+
+		 std::sort(indices.begin(), indices.end());
+
+	     output.reserve(outputSize); // reserve to prevent reallocation
+	     std::transform(cbegin(indices), cend(indices),
+	          back_inserter(output),
+	          [&samples](auto const index) {
+	                return *std::next(cbegin(samples), index);
+	                // note, for std::vector or std::array of samples, you can use
+	                // return samples[index];
+	     	 });
+	}
+    return output;
+}
+
+template<typename T>
+T mostFrequent(std::vector<T> arr) {
+    // code here
+	int n = arr.size();
+    int maxcount = 0;
+    T element_having_max_freq;
+    for (int i = 0; i < n; i++) {
+        int count = 0;
+        for (int j = 0; j < n; j++) {
+            if (arr[i] == arr[j])
+                count++;
+        }
+
+        if(count > maxcount) {
+            maxcount = count;
+            element_having_max_freq = arr[i];
+        }
+    }
+
+    return element_having_max_freq;
 }
 
 #endif /* SRC_UTILS_TEMPHELPFUNCTIONS_HPP_ */

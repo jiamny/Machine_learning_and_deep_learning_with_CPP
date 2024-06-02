@@ -78,4 +78,5 @@ torch::Tensor polyf(torch::Tensor U, torch::Tensor beta);
 
 torch::Tensor to_categorical(torch::Tensor X, int n_col=0);
 
+
 #endif /* HELPFUNCTION_H_ */

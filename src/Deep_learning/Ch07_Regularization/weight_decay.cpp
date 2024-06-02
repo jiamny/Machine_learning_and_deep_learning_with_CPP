@@ -101,6 +101,8 @@ void train_test(std::pair<torch::Tensor, torch::Tensor> train_data,
 int main() {
 
 	std::cout << "Current path is " << get_current_dir_name() << '\n';
+	torch::manual_seed(123);
+
 	auto options = torch::TensorOptions().dtype(torch::kFloat).device(torch::kCPU);
 
 	// Device

@@ -99,4 +99,17 @@ set_target_properties(ML_P1_supervised_learning_ch09_GMM PROPERTIES CXX_STANDARD
 
 # -------------------------------------------------------------------------------------
 
+add_executable(ML_P1_supervised_learning_ch10_HMM_baum_welch 
+	Ch10_HiddenMarkov/HiddenMarkov_baum_welch.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp)
+				
+target_link_libraries(ML_P1_supervised_learning_ch10_HMM_baum_welch ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P1_supervised_learning_ch10_HMM_baum_welch PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
+
+
+
 

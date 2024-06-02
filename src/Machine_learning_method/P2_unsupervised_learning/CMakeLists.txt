@@ -45,4 +45,17 @@ set_target_properties(ML_P2_unsupervised_learning_ch17_LSA PROPERTIES CXX_STANDA
 
 # -------------------------------------------------------------------------------------
 
+add_executable(ML_P2_unsupervised_learning_ch18_EM_PLSA Ch18_PLSA/EM_based_PLSA.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp)
+				
+target_link_libraries(ML_P2_unsupervised_learning_ch18_EM_PLSA ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P2_unsupervised_learning_ch18_EM_PLSA PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
+
+
+
+
 

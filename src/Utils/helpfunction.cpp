@@ -157,6 +157,7 @@ std::vector<double> tensorTovector(torch::Tensor x) {
 	return vX;
 }
 
+
 torch::Tensor polyf(torch::Tensor U, torch::Tensor beta) {
 	auto t = torch::arange(0, beta.size(0)).to(U.dtype());
 	std::cout << t.dtype() << '\n';
@@ -186,5 +187,6 @@ torch::Tensor to_categorical(torch::Tensor X, int n_col) {
     one_hot.index_put_({torch::arange(X.size(0)), X}, 1.);
     return one_hot;
 }
+
 
 
