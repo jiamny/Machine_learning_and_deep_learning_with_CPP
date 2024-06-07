@@ -9,41 +9,19 @@
 #include <torch/script.h>
 #include <torch/autograd.h>
 #include <torch/utils.h>
+#include <regex>
 #include <iostream>
-#include <unistd.h>
 #include <iomanip>
 #include <set>
+#include <unistd.h>
 
+#include "../../../Utils/csvloader.h"
 #include "../../../Utils/helpfunction.h"
 #include "../../../Utils/TempHelpFunctions.h"
-#include "../../../Utils/csvloader.h"
 
 using torch::indexing::Slice;
 using torch::indexing::None;
 
-
-std::string replace_all_char(std::string str, std::string replacement, std::vector<std::string> toBeReplaced) {
-	for(auto& toberep : toBeReplaced) {
-		//std::replace(str.begin(), str.end(), toberep, replacement);
-	    size_t pos;
-	    while ((pos = str.find(toberep)) != std::string::npos) {
-	        str.replace(pos, 1, replacement);
-	    }
-	}
-	return str;
-}
-
-std::vector<std::string> stringSplit(const std::string& str, char delim) {
-    std::stringstream ss(str);
-    std::string item;
-    std::vector<std::string> elems;
-    while (std::getline(ss, item, delim)) {
-        if(!item.empty()) {
-            elems.push_back(item);
-        }
-    }
-    return elems;
-}
 
 std::tuple<std::vector<std::string>, std::vector<std::vector<std::string>>, std::vector<std::string>> load_data(
 		std::string path, std::vector<std::string> string_punctuations, std::vector<std::string> english_stopword) {
@@ -162,6 +140,7 @@ int main() {
 
 	std::cout << "Current path is " << get_current_dir_name() << '\n';
 	torch::manual_seed(123);
+
 	std::vector<std::string> string_punctuations = {"!", "\"", "#", "$", "%", "&", "'", "(", ")", "*", "+",
 													",", "-", ".", "/", ":", ";", "<", "=", ">", "?", "@",
 													"[", "\\", "]", "^", "_", "`", "{", "|", "}", "~"};

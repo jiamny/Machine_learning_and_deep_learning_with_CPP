@@ -189,4 +189,27 @@ torch::Tensor to_categorical(torch::Tensor X, int n_col) {
 }
 
 
+std::string replace_all_char(std::string str, std::string replacement, std::vector<std::string> toBeReplaced) {
+	for(auto& toberep : toBeReplaced) {
+		//std::replace(str.begin(), str.end(), toberep, replacement);
+	    size_t pos;
+	    while ((pos = str.find(toberep)) != std::string::npos) {
+	        str.replace(pos, 1, replacement);
+	    }
+	}
+	return str;
+}
+
+std::vector<std::string> stringSplit(const std::string& str, char delim) {
+    std::stringstream ss(str);
+    std::string item;
+    std::vector<std::string> elems;
+    while (std::getline(ss, item, delim)) {
+        if(!item.empty()) {
+            elems.push_back(item);
+        }
+    }
+    return elems;
+}
+
 

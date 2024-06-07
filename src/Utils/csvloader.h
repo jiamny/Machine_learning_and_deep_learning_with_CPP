@@ -22,6 +22,7 @@ bool isNumberRegex(const std::string& str) {
 	return std::regex_match(str, numberRegex);
 }
 
+
 class CSVRow {
 public:
 	float operator[](std::size_t index) {

@@ -54,6 +54,23 @@ set_target_properties(ML_P2_unsupervised_learning_ch18_EM_PLSA PROPERTIES CXX_ST
 
 # -------------------------------------------------------------------------------------
 
+add_executable(ML_P2_unsupervised_learning_ch18_PLSA Ch18_PLSA/PLSA.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp)
+				
+target_link_libraries(ML_P2_unsupervised_learning_ch18_PLSA ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P2_unsupervised_learning_ch18_PLSA PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
+add_executable(ML_P2_unsupervised_learning_ch19_Gibbs_sampling Ch19_MCMC_MonteCarlo/Gibbs_sampling.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp)
+				
+target_link_libraries(ML_P2_unsupervised_learning_ch19_Gibbs_sampling ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P2_unsupervised_learning_ch19_Gibbs_sampling PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
 
 
 

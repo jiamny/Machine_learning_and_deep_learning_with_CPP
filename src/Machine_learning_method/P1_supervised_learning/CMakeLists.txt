@@ -109,6 +109,54 @@ set_target_properties(ML_P1_supervised_learning_ch10_HMM_baum_welch PROPERTIES C
 
 # -------------------------------------------------------------------------------------
 
+add_executable(ML_P1_supervised_learning_ch10_HMM_viterbi 
+	Ch10_HiddenMarkov/HiddenMarkov_viterbi.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp)
+				
+target_link_libraries(ML_P1_supervised_learning_ch10_HMM_viterbi ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P1_supervised_learning_ch10_HMM_viterbi PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+add_executable(ML_P1_supervised_learning_ch10_HMM_approximation 
+	Ch10_HiddenMarkov/HiddenMarkov_approximation.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp)
+				
+target_link_libraries(ML_P1_supervised_learning_ch10_HMM_approximation ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P1_supervised_learning_ch10_HMM_approximation PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+add_executable(ML_P1_supervised_learning_ch11_CRF
+	Ch11_Conditional_random_field/CRF.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp)
+				
+target_link_libraries(ML_P1_supervised_learning_ch11_CRF ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P1_supervised_learning_ch11_CRF PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
+add_executable(ML_P1_supervised_learning_ch12_supervised_summary 
+	Ch12_Supervised_learning_summary/Supervised_learning_summary.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp)
+				
+target_link_libraries(ML_P1_supervised_learning_ch12_supervised_summary ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P1_supervised_learning_ch12_supervised_summary PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
 
 
 

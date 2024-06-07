@@ -21,6 +21,7 @@
 #include <numeric>   // iota()
 #include <random>
 #include <tuple>
+#include "TempHelpFunctions.h"
 
 using namespace std;
 
@@ -78,5 +79,8 @@ torch::Tensor polyf(torch::Tensor U, torch::Tensor beta);
 
 torch::Tensor to_categorical(torch::Tensor X, int n_col=0);
 
+std::string replace_all_char(std::string str, std::string replacement, std::vector<std::string> toBeReplaced);
+
+std::vector<std::string> stringSplit(const std::string& str, char delim);
 
 #endif /* HELPFUNCTION_H_ */
