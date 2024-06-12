@@ -70,7 +70,7 @@ int main() {
 	std::cout << "// --------------------------------------------------\n";
 	std::cout << "// suffle data\n";
 	std::cout << "// --------------------------------------------------\n";
-	torch::Tensor sidx = RangeToensorIndex(100, true);
+	torch::Tensor sidx = RangeTensorIndex(100, true);
 	printVector(tensorTovector(sidx.squeeze().to(torch::kDouble)));
 
 	IX = torch::index_select(IX, 0, sidx.squeeze());
@@ -117,7 +117,7 @@ int main() {
 	std::cout << "// --------------------------------------------------\n";
 	std::cout << "// suffle data\n";
 	std::cout << "// --------------------------------------------------\n";
-	sidx = RangeToensorIndex(num_records, true);
+	sidx = RangeTensorIndex(num_records, true);
 
 	// ---- split train and test datasets
 	std::unordered_set<int> train_idx;
@@ -168,7 +168,7 @@ int main() {
 	std::cout << "// --------------------------------------------------\n";
 	std::cout << "// suffle data\n";
 	std::cout << "// --------------------------------------------------\n";
-	sidx = RangeToensorIndex(num_records, true);
+	sidx = RangeTensorIndex(num_records, true);
 
 	// ---- split train and test datasets
 	std::unordered_set<int> ktrain_idx;
@@ -188,11 +188,11 @@ int main() {
 	ktrain_dt = ktrain_dt.to(torch::kDouble);
 	ktest_dt = ktest_dt.to(torch::kDouble);
 
-	sidx = RangeToensorIndex(ktrain_dt.size(0), true);
+	sidx = RangeTensorIndex(ktrain_dt.size(0), true);
 	ktrain_dt = torch::index_select(ktrain_dt, 0, sidx.squeeze());
 	ktrain_lab = torch::index_select(ktrain_lab, 0, sidx.squeeze());
 
-	sidx = RangeToensorIndex(ktest_dt.size(0), true);
+	sidx = RangeTensorIndex(ktest_dt.size(0), true);
 	ktest_dt = torch::index_select(ktest_dt, 0, sidx.squeeze());
 	ktest_lab = torch::index_select(ktest_lab, 0, sidx.squeeze());
 
@@ -229,7 +229,7 @@ int main() {
 	std::cout << "// --------------------------------------------------\n";
 	std::cout << "// suffle data\n";
 	std::cout << "// --------------------------------------------------\n";
-	sidx = RangeToensorIndex(num_records -1, true);
+	sidx = RangeTensorIndex(num_records -1, true);
 	std::vector<double> indices = tensorTovector(sidx.squeeze().to(torch::kDouble));
 
 	// ---- split train and test datasets

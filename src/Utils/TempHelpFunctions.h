@@ -210,6 +210,7 @@ std::vector<T> random_choice(int const outputSize, const std::vector<T> samples,
     return output;
 }
 
+
 template<typename T>
 T mostFrequent(std::vector<T> arr) {
     // code here
@@ -230,6 +231,22 @@ T mostFrequent(std::vector<T> arr) {
     }
 
     return element_having_max_freq;
+}
+
+template<typename T>
+std::string join(std::vector<T> const &vec, std::string delim) {
+    if (vec.empty()) {
+        return std::string();
+    }
+
+    std::stringstream ss;
+    for (auto it = vec.begin(); it != vec.end(); it++)    {
+        if (it != vec.begin()) {
+            ss << delim;
+        }
+        ss << *it;
+    }
+    return ss.str();
 }
 
 #endif /* SRC_UTILS_TEMPHELPFUNCTIONS_HPP_ */

@@ -61,7 +61,7 @@ int main() {
 	std::cout << "// --------------------------------------------------\n";
 	std::cout << "// suffle data\n";
 	std::cout << "// --------------------------------------------------\n";
-	torch::Tensor sidx = RangeToensorIndex(num_records, true);
+	torch::Tensor sidx = RangeTensorIndex(num_records, true);
 
 	X = torch::index_select(X, 0, sidx.squeeze());
 	y = torch::index_select(y, 0, sidx.squeeze());

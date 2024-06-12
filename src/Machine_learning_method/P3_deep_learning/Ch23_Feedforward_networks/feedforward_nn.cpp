@@ -181,7 +181,7 @@ int main() {
 	std::cout << "// --------------------------------------------------\n";
 	std::cout << "// suffle data\n";
 	std::cout << "// --------------------------------------------------\n";
-	torch::Tensor sidx = RangeToensorIndex(num_records, true);
+	torch::Tensor sidx = RangeTensorIndex(num_records, true);
 
 	std::vector<double> indices = tensorTovector(sidx.squeeze().to(torch::kDouble));
 	// ---- split train and test datasets

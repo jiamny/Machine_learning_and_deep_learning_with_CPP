@@ -72,6 +72,67 @@ set_target_properties(ML_P2_unsupervised_learning_ch19_Gibbs_sampling PROPERTIES
 
 # -------------------------------------------------------------------------------------
 
+add_executable(ML_P2_unsupervised_learning_ch19_MetropolisHastings Ch19_MCMC_MonteCarlo/MetropolisHastings.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp)
+				
+target_link_libraries(ML_P2_unsupervised_learning_ch19_MetropolisHastings ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P2_unsupervised_learning_ch19_MetropolisHastings PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
+add_executable(ML_P2_unsupervised_learning_ch19_MonteCarloIntegration Ch19_MCMC_MonteCarlo/MonteCarloIntegration.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp)
+				
+target_link_libraries(ML_P2_unsupervised_learning_ch19_MonteCarloIntegration ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P2_unsupervised_learning_ch19_MonteCarloIntegration PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
+add_executable(ML_P2_unsupervised_learning_ch19_MCMC Ch19_MCMC_MonteCarlo/MCMC.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp)
+				
+target_link_libraries(ML_P2_unsupervised_learning_ch19_MCMC ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P2_unsupervised_learning_ch19_MCMC PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
+add_executable(ML_P2_unsupervised_learning_ch20_GibbsSamplingLDA Ch20_LDA/GibbsSamplingLDA.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp)
+				
+target_link_libraries(ML_P2_unsupervised_learning_ch20_GibbsSamplingLDA ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P2_unsupervised_learning_ch20_GibbsSamplingLDA PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
+add_executable(ML_P2_unsupervised_learning_ch20_LDA Ch20_LDA/LDA.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp)
+				
+target_link_libraries(ML_P2_unsupervised_learning_ch20_LDA ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P2_unsupervised_learning_ch20_LDA PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
+add_executable(ML_P2_unsupervised_learning_ch21_PageRank Ch21_PageRank/PageRank.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp)
+				
+target_link_libraries(ML_P2_unsupervised_learning_ch21_PageRank ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P2_unsupervised_learning_ch21_PageRank PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
 
 
 

@@ -2,7 +2,7 @@
  * PLSA.cpp
  *
  *  Created on: Jun 2, 2024
-  *      Author: jiamny
+ *      Author: jiamny
  */
 
 #include <torch/torch.h>
@@ -24,7 +24,7 @@ using torch::indexing::None;
 
 // 定义构建单词-文本矩阵的函数，这里矩阵的每一项表示单词在文本中的出现频次，也可以用TF-IDF来表示
 std::pair<std::vector<std::string>, torch::Tensor> frequency_counter(std::vector<std::vector<std::string>> text,
-															std::vector<std::string> words) {
+															std::vector<std::string> words, int M) {
     /*
     text - (list) 文本列表
     words - (list) 单词列表
@@ -35,7 +35,7 @@ std::pair<std::vector<std::string>, torch::Tensor> frequency_counter(std::vector
     */
     torch::Tensor words_cnt = torch::zeros({static_cast<long int>(words.size())}, torch::kInt32);   // 用来保存单词的出现频次
     // 定义m*n的矩阵，其中m为单词列表中的单词个数，为避免运行时间过长，这里只取了出现频次为前1000的单词，因此m为1000，n为文本个数
-    torch::Tensor X = torch::zeros({1000, static_cast<long int>(text.size())});  //
+    torch::Tensor X = torch::zeros({M, static_cast<long int>(text.size())});  //
     // 循环计算words列表中各单词出现的词频
     for(auto& i : range(static_cast<int>(text.size()), 0)) {
     	std::vector<std::string> t = text[i];  // 取出第i条文本
@@ -56,7 +56,7 @@ std::pair<std::vector<std::string>, torch::Tensor> frequency_counter(std::vector
 
     // 将出现频次前1000的单词保存到words列表
     std::vector<std::string> wds;
-	for(auto& ind : range(1000, 0))	 {
+	for(auto& ind : range(M, 0))	 {
 		int idx = sort_inds[ind].data().item<int>();
 		wds.push_back(words[idx]);
 	}
@@ -74,6 +74,7 @@ std::pair<std::vector<std::string>, torch::Tensor> frequency_counter(std::vector
     }
     return std::make_pair(wds, X);
 }
+
 
 // 定义概率潜在语义分析函数，采用EM算法进行PLSA模型的参数估计
 std::pair<torch::Tensor, torch::Tensor> do_plsa(torch::Tensor X, int K, std::vector<std::string> words, int iters = 10) {
@@ -257,7 +258,7 @@ int main() {
 	std::cout << "// --------------------------------------------------\n";
 	std::vector<std::string> Words;
 	torch::Tensor X;
-	std::tie( Words, X ) = frequency_counter(text, words);  // 取频次前1000的单词重新构建单词列表，并构建单词-文本矩阵
+	std::tie( Words, X ) = frequency_counter(text, words, 1000);  // 取频次前1000的单词重新构建单词列表，并构建单词-文本矩阵
 	std::cout << X << '\n';
 	std::cout << Words.size() << '\n';
 

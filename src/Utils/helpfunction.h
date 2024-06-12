@@ -67,7 +67,7 @@ int64_t accuracy(torch::Tensor y_hat, torch::Tensor y);
 // data batch indices
 std::list<torch::Tensor> data_index_iter(int64_t num_examples, int64_t batch_size, bool shuffle = true);
 
-torch::Tensor RangeToensorIndex(int64_t num, bool suffle = false);
+torch::Tensor RangeTensorIndex(int64_t num, bool suffle = false);
 
 torch::Tensor vectorTotensor(std::vector<double>  x);
 

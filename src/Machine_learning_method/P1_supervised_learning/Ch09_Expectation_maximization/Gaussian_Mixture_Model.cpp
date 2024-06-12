@@ -265,7 +265,7 @@ int main() {
 	std::cout << "// --------------------------------------------------\n";
 	std::cout << "// suffle data\n";
 	std::cout << "// --------------------------------------------------\n";
-	torch::Tensor sidx = RangeToensorIndex(num_records, true);
+	torch::Tensor sidx = RangeTensorIndex(num_records, true);
 
 	// ---- split train and test datasets
 	std::unordered_set<int> train_idx;
@@ -281,11 +281,11 @@ int main() {
 
 	file.close();
 
-	sidx = RangeToensorIndex(train_dt.size(0), true);
+	sidx = RangeTensorIndex(train_dt.size(0), true);
 	train_dt = torch::index_select(train_dt, 0, sidx.squeeze());
 	train_lab = torch::index_select(train_lab, 0, sidx.squeeze());
 
-	sidx = RangeToensorIndex(test_dt.size(0), true);
+	sidx = RangeTensorIndex(test_dt.size(0), true);
 	test_dt = torch::index_select(test_dt, 0, sidx.squeeze());
 	test_lab = torch::index_select(test_lab, 0, sidx.squeeze());
 

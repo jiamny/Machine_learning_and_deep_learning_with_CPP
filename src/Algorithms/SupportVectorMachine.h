@@ -98,7 +98,7 @@ public:
         	// -------------------------------------------------------------
         	// shuffle data
         	// -------------------------------------------------------------
-        	torch::Tensor sidx = RangeToensorIndex(X.size(0), true);
+        	torch::Tensor sidx = RangeTensorIndex(X.size(0), true);
         	X = torch::index_select(X, 0, sidx.squeeze());
         	y = torch::index_select(y, 0, sidx.squeeze());
 

@@ -58,7 +58,7 @@ int main() {
 	std::cout << "// --------------------------------------------------\n";
 	std::cout << "// suffle data\n";
 	std::cout << "// --------------------------------------------------\n";
-	torch::Tensor sidx = RangeToensorIndex(100, true);
+	torch::Tensor sidx = RangeTensorIndex(100, true);
 	printVector(tensorTovector(sidx.squeeze().to(torch::kDouble)));
 
 	IX = torch::index_select(IX, 0, sidx.squeeze());

@@ -77,7 +77,7 @@ std::tuple<std::vector<std::string>, std::vector<std::vector<std::string>>, std:
 }
 
 //定义构建单词-文本矩阵的函数，这里矩阵的每一项表示单词在文本中的出现频次，也可以用TF-IDF来表示
-torch::Tensor frequency_counter(std::vector<std::vector<std::string>> text, std::vector<std::string> words) {
+torch::Tensor _frequency_counter(std::vector<std::vector<std::string>> text, std::vector<std::string> words) {
     /*
     INPUT:
     text - (list) 文本列表
@@ -175,7 +175,7 @@ int main() {
 	std::cout <<"text: "   << text.size() << '\n';
 	std::cout <<"words: "  << words.size() << '\n';
 
-	torch::Tensor X = frequency_counter(text, words);		// 构建单词-文本矩阵
+	torch::Tensor X = _frequency_counter(text, words);		// 构建单词-文本矩阵
 	int k = topics.size();  								// 设定话题数为5
 
 	std::vector<std::string> tops = do_lsa(X, k, words);	// 进行潜在语义分析

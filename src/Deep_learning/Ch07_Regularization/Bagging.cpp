@@ -61,7 +61,7 @@ int main() {
 	std::cout << "// --------------------------------------------------\n";
 	//auto seed = std::chrono::system_clock::now().time_since_epoch().count();
 	//std::shuffle(indices.begin(), indices.end(), std::default_random_engine(seed));
-	torch::Tensor sidx = RangeToensorIndex(num_records, true);
+	torch::Tensor sidx = RangeTensorIndex(num_records, true);
 
 	std::vector<double> indices = tensorTovector(sidx.squeeze().to(torch::kDouble));
 

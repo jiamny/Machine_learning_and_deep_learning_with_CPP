@@ -132,7 +132,7 @@ std::list<torch::Tensor> data_index_iter(int64_t num_examples, int64_t batch_siz
 	return( batch_indices );
 }
 
-torch::Tensor RangeToensorIndex(int64_t num, bool suffle) {
+torch::Tensor RangeTensorIndex(int64_t num, bool suffle) {
 	std::vector<int64_t> idx;
 	for( int64_t i = 0; i < num; i++ )
 		idx.push_back(i);
@@ -211,5 +211,4 @@ std::vector<std::string> stringSplit(const std::string& str, char delim) {
     }
     return elems;
 }
-
 

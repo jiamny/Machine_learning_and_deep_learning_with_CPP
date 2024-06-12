@@ -29,7 +29,7 @@ std::vector<std::pair<torch::Tensor, torch::Tensor>> get_random_subsets(
     int n_samples = X.size(0);
 
     // 将 X 和 y 拼接，并将元素随机排序
-	torch::Tensor sidx = RangeToensorIndex(X.size(0), true);
+	torch::Tensor sidx = RangeTensorIndex(X.size(0), true);
 
 	X = torch::index_select(X, 0, sidx.squeeze());
 	y = torch::index_select(y, 0, sidx.squeeze());
