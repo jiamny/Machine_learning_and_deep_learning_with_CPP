@@ -88,6 +88,15 @@ target_link_libraries(DL_Ch06_XOR ${TORCH_LIBRARIES} matplot)
 set_target_properties(DL_Ch06_XOR PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
 # -------------------------------------------------------------------------------------
+add_executable(DL_Ch06_activation_demo 
+		Ch06_Deep_feedforward_networks/activation_function_demo.cpp
+		../Utils/helpfunction.h
+		../Utils/helpfunction.cpp)
+				
+target_link_libraries(DL_Ch06_activation_demo ${TORCH_LIBRARIES} matplot)
+set_target_properties(DL_Ch06_activation_demo PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
 add_executable(DL_Ch07_Regularization
 		Ch07_Regularization/Regularization.cpp
 		../Utils/helpfunction.h
@@ -157,6 +166,36 @@ target_link_libraries(DL_Ch08_Optimization_demo ${TORCH_LIBRARIES} matplot)
 set_target_properties(DL_Ch08_Optimization_demo PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
 # -------------------------------------------------------------------------------------
+add_executable(DL_Ch08_BatchNormalization
+		Ch08_Optimization/BatchNormalization.cpp
+		../Utils/helpfunction.h
+		../Utils/helpfunction.cpp)
+				
+target_link_libraries(DL_Ch08_BatchNormalization ${TORCH_LIBRARIES} matplot)
+set_target_properties(DL_Ch08_BatchNormalization PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+add_executable(DL_Ch08_GradientDescent
+		Ch08_Optimization/GradientDescent.cpp
+		../Utils/helpfunction.h
+		../Utils/helpfunction.cpp)
+				
+target_link_libraries(DL_Ch08_GradientDescent ${TORCH_LIBRARIES} matplot)
+set_target_properties(DL_Ch08_GradientDescent PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+add_executable(DL_Ch09_Convolutional_networks
+		Ch09_Convolutional_networks/ConvolutionalNetworks.cpp
+		../Utils/helpfunction.h
+		../Utils/helpfunction.cpp
+		../Utils/fashion.cpp
+		../Utils/fashion.h)
+				
+target_link_libraries(DL_Ch09_Convolutional_networks ${TORCH_LIBRARIES} matplot)
+set_target_properties(DL_Ch09_Convolutional_networks PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
 
 
 

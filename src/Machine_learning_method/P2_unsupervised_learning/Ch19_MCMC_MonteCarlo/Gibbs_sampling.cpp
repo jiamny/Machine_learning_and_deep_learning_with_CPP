@@ -180,7 +180,6 @@ public:
         legend(ax, {});
 		title(ax, "Gibbs Sampling");
 		matplot::show();
-
     }
 };
 

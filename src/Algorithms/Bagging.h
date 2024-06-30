@@ -2,7 +2,7 @@
  * Bagging.h
  *
  *  Created on: May 31, 2024
- *      Author: hhj
+ *      Author: jiamny
  */
 
 #ifndef BAGGING_H_

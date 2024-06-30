@@ -26,6 +26,9 @@
 using torch::indexing::Slice;
 using torch::indexing::None;
 
+#include <matplot/matplot.h>
+using namespace matplot;
+
 torch::Tensor net(torch::Tensor X, torch::Tensor& W1, torch::Tensor& b1, torch::Tensor& W2, torch::Tensor& b2) {
 	_ReLU relu;
 	//auto output = torch::relu(torch::add(torch::mm(X, W1), b1));  // Here '@' stands for matrix multiplication
@@ -51,7 +54,7 @@ std::vector<torch::Tensor> prepare_parameters(torch::Device device) {
 	return params;
 }
 
-void optimization_demo(torch::nn::CrossEntropyLoss criterion, torch::optim::Optimizer& trainer,
+std::vector<double> optimization_demo(torch::nn::CrossEntropyLoss criterion, torch::optim::Optimizer& trainer,
 		std::vector<torch::Tensor> params, std::string optim, torch::Device device) {
 
 	std::cout << "// --------------------------------------------------\n";
@@ -91,6 +94,7 @@ void optimization_demo(torch::nn::CrossEntropyLoss criterion, torch::optim::Opti
 	/*
 	 * Training
 	 */
+	std::vector<double> t_loss;
 
 	for( size_t epoch = 0; epoch < num_epochs; epoch++ ) {
 
@@ -126,11 +130,13 @@ void optimization_demo(torch::nn::CrossEntropyLoss criterion, torch::optim::Opti
 			num_train_samples += x.size(0);
 		}
 
-		auto sample_mean_loss = epoch_loss / num_train_samples;
+		double sample_mean_loss = epoch_loss*1.0 / num_train_samples;
 
 		if((epoch+1) % 20 == 0)
 			std::cout << "Epoch [" << (epoch + 1) << "/" << num_epochs << "], Trainset - Loss: "
 					            << sample_mean_loss << '\n';
+
+		t_loss.push_back(sample_mean_loss);
 	}
 	std::cout << "Testing...\n";
 
@@ -159,6 +165,8 @@ void optimization_demo(torch::nn::CrossEntropyLoss criterion, torch::optim::Opti
 	auto test_accuracy = static_cast<double>(epoch_correct) / num_test_samples;
 
 	std::cout << optim << " -- accuracy: " << test_accuracy << "\n\n";
+
+	return t_loss;
 }
 
 
@@ -182,7 +190,7 @@ int main() {
 
 	float lr = 0.001;
 	torch::optim::SGD trainer = torch::optim::SGD(parameters, lr);
-	optimization_demo(criterion, trainer, params, optim, device);
+	std::vector<double> y_sgd = optimization_demo(criterion, trainer, params, optim, device);
 
 	optim = "Adam";
 	params = prepare_parameters(device);
@@ -190,7 +198,7 @@ int main() {
 	parameters.push_back(torch::optim::OptimizerParamGroup(params));
 
 	torch::optim::Adam a_trainer = torch::optim::Adam(parameters, lr);
-	optimization_demo(criterion, a_trainer, params, optim, device);
+	std::vector<double> y_adam = optimization_demo(criterion, a_trainer, params, optim, device);
 
 	optim = "Adagrad";
 	params = prepare_parameters(device);
@@ -199,7 +207,7 @@ int main() {
 	lr = 0.01;
 
 	torch::optim::Adagrad ad_trainer = torch::optim::Adagrad(parameters, lr);
-	optimization_demo(criterion, ad_trainer, params, optim, device);
+	std::vector<double> y_adagrad = optimization_demo(criterion, ad_trainer, params, optim, device);
 
 	optim = "RMSprop";
 	params = prepare_parameters(device);
@@ -208,7 +216,7 @@ int main() {
 
 	torch::optim::RMSprop r_trainer = torch::optim::RMSprop(parameters,
 			torch::optim::RMSpropOptions(lr).weight_decay(0.95));
-	optimization_demo(criterion, r_trainer, params, optim, device);
+	std::vector<double> y_rmsprop = optimization_demo(criterion, r_trainer, params, optim, device);
 
 	optim = "AdamW";
 	params = prepare_parameters(device);
@@ -217,7 +225,31 @@ int main() {
 	lr = 0.001;
 	torch::optim::AdamW aw_trainer = torch::optim::AdamW(parameters,
 			torch::optim::AdamWOptions(lr));
-	optimization_demo(criterion, aw_trainer, params, optim, device);
+	std::vector<double> y_adamw = optimization_demo(criterion, aw_trainer, params, optim, device);
+
+	std::vector<double> xx;
+	for(auto& i : range(100, 0))
+		xx.push_back(i *1.0);
+
+	auto F = figure(true);
+	F->size(800, 600);
+	F->add_axes(false);
+	F->reactive_mode(false);
+	F->tiledlayout(1, 1);
+	F->position(0, 0);
+
+	auto ax = F->nexttile();
+	plot(ax, xx, y_sgd, "r;")->line_width(2).display_name("SGD");
+	hold(ax, on);
+	plot(ax, xx, y_adam, "b-")->line_width(2).display_name("Adam");
+	plot(ax, xx, y_adagrad, "g-.")->line_width(2).display_name("AdaGrad");
+	plot(ax, xx, y_rmsprop, "m--")->line_width(2).display_name("RMSprop");
+	//plot(ax, xx, y_adamw, "m--")->line_width(2).display_name("AdamW");
+	xlabel("epoch");
+	ylabel("loss");
+	legend(ax, {});
+	F->draw();
+	show();
 
 	std::cout << "Done!\n";
 	return 0;

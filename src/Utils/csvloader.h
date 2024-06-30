@@ -166,6 +166,51 @@ std::pair<std::vector<float>, std::vector<float>> process_data(
 	return std::make_pair(inputs, label);
 }
 
+std::pair<torch::Tensor, torch::Tensor> process_float_data( std::ifstream &file) {
+	std::vector<std::vector<float>> features;
+	std::vector<float> label;
+
+	CSVRow row;
+	// Read and throw away the first row.
+	file >> row;
+
+	int64_t n = 0;
+	// last column is label
+	while (file >> row) {
+		if( n == 0 ) {
+			for( std::size_t loop = 0; loop < (row.size() - 1); ++loop ) {
+				std::vector<float> v;
+				v.push_back(row[loop]*1.0);
+				features.push_back(v);
+			}
+
+		} else {
+			for( std::size_t loop = 0; loop < (row.size() - 1); ++loop )
+				features[loop].push_back(row[loop]*1.0);
+		}
+
+		// Push final column to label vector
+		label.push_back(row[row.size() - 1]);
+		n++;
+	}
+
+	int r = features[0].size();
+	int c = features.size();
+	std::vector<float> trData;
+	for( int j = 0; j < r; j++ ) {
+		for( int i = 0; i < c; i++ ) {
+			std::vector<float> b = features[i];
+			trData.push_back(b[j]);
+		}
+	}
+
+	torch::Tensor data = torch::from_blob(trData.data(), {r, c}, c10::TensorOptions(torch::kFloat32)).clone();
+	torch::Tensor target = torch::from_blob(label.data(),
+			{static_cast<int>(label.size())}, c10::TensorOptions(torch::kFloat32)).clone();
+
+	return std::make_pair(data, target);
+}
+
 std::pair<std::vector<std::string>, std::vector<std::string>> process_bbc_news_data(
 		std::ifstream &file, bool skip_header=true) {
 	std::vector<std::string> texts;

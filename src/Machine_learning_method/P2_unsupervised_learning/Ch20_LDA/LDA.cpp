@@ -84,7 +84,7 @@ std::tuple<std::vector<std::vector<std::string>>, std::vector<std::string>, torc
 
 //定义潜在狄利克雷分配函数，采用收缩的吉布斯抽样算法估计模型的参数theta和phi
 std::pair<torch::Tensor, torch::Tensor> do_lda(std::vector<std::vector<std::string>> text,
-		std::vector<std::string> words, torch::Tensor alpha, torch::Tensor beta, int K, int iters) {
+		std::map<std::string, int> m_words, torch::Tensor alpha, torch::Tensor beta, int K, int iters) {
     /*
     INPUT:
     text - (list) 文本列表
@@ -100,7 +100,7 @@ std::pair<torch::Tensor, torch::Tensor> do_lda(std::vector<std::vector<std::stri
     */
 
     int M = text.size();  // 文本数
-    int V = words.size();  // 单词数
+    int V = m_words.size();  // 单词数
     torch::Tensor N_MK = torch::zeros({M, K}, torch::kInt32);   // 文本-话题计数矩阵
     torch::Tensor N_KV = torch::zeros({K, V}, torch::kInt32);   // 话题-单词计数矩阵
     torch::Tensor N_M = torch::zeros({M}, torch::kInt32);  	 // 文本计数向量
@@ -112,62 +112,58 @@ std::pair<torch::Tensor, torch::Tensor> do_lda(std::vector<std::vector<std::stri
     	std::vector<int> zm;
         std::vector<std::string> t = text[m];
         for(int n = 0; n < t.size(); n++) {
-        	auto it = std::find(words.begin(), words.end(), t[n]);
-        	if (it != words.end()) {
-        	    int v = it - words.begin();
-        	    //v = words.index(w)
-        	    int z = torch::randint(0, K, {1}).data().item<int>();
-            	zm.push_back(z);
-				N_MK[m][z] += 1;
-				N_M[m] += 1;
-				N_KV[z][v] += 1;
-				N_K[z] += 1;
-        	}
+        	int v = m_words[t[n]];
+        	int z = torch::randint(0, K, {1}).data().item<int>();
+            zm.push_back(z);
+			N_MK[m][z] += 1;
+			N_M[m] += 1;
+			N_KV[z][v] += 1;
+			N_K[z] += 1;
         }
         Z_MN.push_back(zm);
     }
 
 	// 算法20.2的步骤(3)，多次迭代进行吉布斯抽样
     for(auto& i : range(iters, 0)) {
-       std::cout << (i+1) << "/" << iters << '\n';
+    	int cnt = 0;
         for(auto& m : range(M, 0)) {
             std::vector<std::string> t = text[m];
             for(int n = 0; n < t.size(); n++) {
-            	auto it = std::find(words.begin(), words.end(), t[n]);
-            	if (it != words.end()) {
-            		int v = it - words.begin();
-            		int z = (Z_MN[m])[n];
-            		N_MK[m, z] -= 1;
-            		N_M[m] -= 1;
-            		N_KV[z][v] -= 1;
-            		N_K[z] -= 1;
-            		// 用来保存对K个话题的条件分布p(zi|z_i,w,alpha,beta)的计算结果
-            		torch::Tensor p = torch::zeros({K}, torch::kDouble);
-            		double sums_k = 0;
-                    for(auto&  k : range(K, 0)) {
-                    	// 话题zi=k的条件分布p(zi|z_i,w,alpha,beta)的分子部分
-                        double p_zk = ((N_KV[k][v] + beta[v]) * (N_MK[m][k] + alpha[k])).data().item<double>();
-                        double sums_v = 0;
-                        sums_k += (N_MK[m][k] + alpha[k]).data().item<double>() ; // 累计(nmk + alpha_k)在K个话题上的和
-                        for(auto& t : range(V, 0)) {
-                            sums_v += (N_KV[k][t] + beta[t]).data().item<double>();  // 累计(nkv + beta_v)在V个单词上的和
-                        }
-                        p_zk /= sums_v;
-                        p[k] = p_zk;
+            	int v = m_words[t[n]];
+            	int z = (Z_MN[m])[n];
+            	N_MK[m][z] -= 1;
+            	N_M[m] -= 1;
+            	N_KV[z][v] -= 1;
+            	N_K[z] -= 1;
+            	// 用来保存对K个话题的条件分布p(zi|z_i,w,alpha,beta)的计算结果
+            	torch::Tensor p = torch::zeros({K}, torch::kDouble);
+            	double sums_k = 0;
+                for(auto&  k : range(K, 0)) {
+                    // 话题zi=k的条件分布p(zi|z_i,w,alpha,beta)的分子部分
+                    double p_zk = ((N_KV[k][v] + beta[v]) * (N_MK[m][k] + alpha[k])).data().item<double>();
+                    double sums_v = 0;
+                    sums_k += (N_MK[m][k] + alpha[k]).data().item<double>() ; // 累计(nmk + alpha_k)在K个话题上的和
+                    for(auto& t : range(V, 0)) {
+                        sums_v += (N_KV[k][t] + beta[t]).data().item<double>();  // 累计(nkv + beta_v)在V个单词上的和
                     }
-                    p.div_(sums_k);
-                    p.div_(torch::sum(p));  //对条件分布p(zi|z_i,w,alpha,beta)进行归一化，保证概率的总和为1
-                    int new_z = static_cast<int>(random_choice(1, tensorTovector(p))[0]);  //根据以上计算得到的概率进行抽样，得到新的话题
-                    //Z_MN[m][n] = new_z
-                    (Z_MN[m])[n] = new_z;  // 更新当前位置处的话题为上面抽样得到的新话题
-                    // 更新计数
-                    N_MK[m][new_z] += 1;
-                    N_M[m] += 1;
-                    N_KV[new_z][v] += 1;
-                    N_K[new_z] += 1;
-            	}
+                    p_zk /= sums_v;
+                    p[k] = p_zk;
+                }
+                p.div_(sums_k);
+                p.div_(torch::sum(p));  //对条件分布p(zi|z_i,w,alpha,beta)进行归一化，保证概率的总和为1
+                int new_z = static_cast<int>(random_choice(1, tensorTovector(p))[0]);  //根据以上计算得到的概率进行抽样，得到新的话题
+                (Z_MN[m])[n] = new_z;  // 更新当前位置处的话题为上面抽样得到的新话题
+                // 更新计数
+                N_MK[m][new_z] += 1;
+                N_M[m] += 1;
+                N_KV[new_z][v] += 1;
+                N_K[new_z] += 1;
             }
+            cnt++;
+            if( cnt % 200 == 0)
+            	std::cout << "texts: " << cnt << "/" << M << '\n';
         }
+        std::cout << "-------------- 迭代次数: " << (i+1) << " / " << iters << '\n';
     }
     // 算法20.2的步骤(4)，利用得到的样本计数，估计模型的参数theta和phi
 	torch::Tensor theta = torch::zeros({M, K}, torch::kDouble);
@@ -180,6 +176,7 @@ std::pair<torch::Tensor, torch::Tensor> do_lda(std::vector<std::vector<std::stri
         }
         theta[m] /= sums_k;  // 计算参数theta
     }
+
     for(auto& k : range(K,0)) {
         double sums_v = 0;
         for(auto& v : range(V,0)) {
@@ -245,6 +242,7 @@ int main() {
 	std::sort(topics.begin(), topics.end());
 	auto it = std::unique(topics.begin(), topics.end());
 	topics.erase(it, topics.end());
+	printVector(topics);
 
 	// 计算各话题的比例作为alpha值
 	torch::Tensor alpha = torch::zeros({static_cast<int>(topics.size())}, torch::kDouble);
@@ -295,13 +293,20 @@ int main() {
 	printVector(tensorTovector(beta));
 	std::cout << Words.size() << '\n';
 
+	std::map<std::string, int> m_words;
+	for(int i = 0; i < Words.size(); i++)
+		m_words[Words[i]] = i;
+
+	m_words.size();
+
 	std::cout << "// --------------------------------------------------\n";
 	std::cout << "// Do latent Dirichlet allocation \n";
 	std::cout << "// --------------------------------------------------\n";
 	int K = topics.size(); // 设定话题数为5
-	int iters = 10;
+	int iters = 1;
+
 	torch::Tensor theta, phi;
-	std::tie(theta, phi) = do_lda(Text, Words, alpha, beta, K, iters); // LDA的吉布斯抽样
+	std::tie(theta, phi) = do_lda(Text, m_words, alpha, beta, K, iters); // LDA的吉布斯抽样
 	// 打印出每个话题zk条件下出现概率最大的前10个单词，即P(wi|zk)在话题zk中最大的10个值对应的单词，作为对话题zk的文本描述
     for(auto& k : range(K, 0)) {
     	// 对话题zk条件下的P(wi|zk)的值进行降序排列后取出对应的索引值
