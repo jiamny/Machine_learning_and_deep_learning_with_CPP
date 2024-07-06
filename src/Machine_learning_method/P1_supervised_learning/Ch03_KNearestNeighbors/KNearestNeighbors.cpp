@@ -24,6 +24,7 @@ int main() {
 
 	std::cout << "Current path is " << get_current_dir_name() << '\n';
 	torch::manual_seed(123);
+
 	std::ifstream file;
 	std::string path = "./data/iris.data";
 	file.open(path, std::ios_base::in);

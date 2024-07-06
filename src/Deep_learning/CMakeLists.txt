@@ -195,6 +195,69 @@ target_link_libraries(DL_Ch09_Convolutional_networks ${TORCH_LIBRARIES} matplot)
 set_target_properties(DL_Ch09_Convolutional_networks PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
 # -------------------------------------------------------------------------------------
+add_executable(DL_Ch10_RecurrentNeuralNetworks
+		Ch10_SequenceModeling/RecurrentNeuralNetworks.cpp
+		../Utils/helpfunction.h
+		../Utils/helpfunction.cpp
+		../Utils/fashion.cpp
+		../Utils/fashion.h)
+				
+target_link_libraries(DL_Ch10_RecurrentNeuralNetworks ${TORCH_LIBRARIES} matplot)
+set_target_properties(DL_Ch10_RecurrentNeuralNetworks PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+add_executable(DL_Ch10_RNN
+		Ch10_SequenceModeling/RNN.cpp
+		../Utils/helpfunction.h
+		../Utils/helpfunction.cpp)
+				
+target_link_libraries(DL_Ch10_RNN ${TORCH_LIBRARIES} matplot)
+set_target_properties(DL_Ch10_RNN PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+add_executable(DL_Ch10_GRU
+		Ch10_SequenceModeling/GatedRecurrentUnits.cpp
+		../Utils/helpfunction.h
+		../Utils/helpfunction.cpp)
+				
+target_link_libraries(DL_Ch10_GRU ${TORCH_LIBRARIES} matplot)
+set_target_properties(DL_Ch10_GRU PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+add_executable(DL_Ch10_LSTM
+		Ch10_SequenceModeling/LongShortTermMemory.cpp
+		../Utils/helpfunction.h
+		../Utils/helpfunction.cpp)
+				
+target_link_libraries(DL_Ch10_LSTM ${TORCH_LIBRARIES} matplot)
+set_target_properties(DL_Ch10_LSTM PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+add_executable(DL_Ch10_1D-Convolutions
+		Ch10_SequenceModeling/1D_Convolutions.cpp
+		../Utils/helpfunction.h
+		../Utils/helpfunction.cpp)
+				
+target_link_libraries(DL_Ch10_1D-Convolutions ${TORCH_LIBRARIES} matplot)
+set_target_properties(DL_Ch10_1D-Convolutions PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

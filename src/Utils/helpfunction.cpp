@@ -1,6 +1,9 @@
 
 #include "helpfunction.h"
 
+using torch::indexing::Slice;
+using torch::indexing::None;
+
 LRdataset::LRdataset(std::pair<torch::Tensor, torch::Tensor> data_and_labels) {
 
     features_ = std::move(data_and_labels.first);
@@ -212,3 +215,47 @@ std::vector<std::string> stringSplit(const std::string& str, char delim) {
     return elems;
 }
 
+std::vector<std::vector<double>> get_mnist_image(torch::Tensor image) {
+	int ncols = 28, nrows = 28;
+	std::vector<std::vector<double>> C;
+	for( int i = 0; i < nrows; i++ ) {
+		std::vector<double> c;
+		for( int j = 0; j < ncols; j++ )
+			c.push_back(image[i][j].item<double>());
+		C.push_back(c);
+	}
+	return C;
+}
+
+std::tuple<std::vector<torch::Tensor>, torch::Tensor> generate_sequences(int n, bool variable_len, int seed) {
+    torch::Tensor basic_corners = torch::tensor({{-1, -1}, {-1, 1}, {1, 1}, {1, -1}});
+    torch::manual_seed(seed);
+
+    torch::Tensor bases = torch::randint(4, n);
+    torch::Tensor lengths;
+    if( variable_len ) {
+        lengths = torch::randint(3, n) + 2;
+    } else {
+        lengths = torch::ones({n})*4;
+    }
+    torch::Tensor directions = torch::randint(2, n);
+
+    std::vector<torch::Tensor> points;
+    for(auto& j : range(n, 0)) {
+    	int b = bases[j].data().item<int>();
+    	int d = directions[j].data().item<int>();
+    	int l = lengths[j].data().item<int>();
+    	torch::Tensor idx = torch::zeros({4}, torch::kInt32);
+    	for(auto& i : range(4, 0)) {
+    		idx[i] = (b + i ) % 4;
+    	}
+    	torch::Tensor pts = basic_corners.index_select(0, idx).to(torch::kFloat32);
+    	if( d*2 - 1 < 0 )
+    		pts = pts.flip({0});
+    	pts = pts.index({Slice(0, l), Slice()}) + torch::randn({l, 2})*0.1;
+    	points.push_back(pts);
+    }
+
+    //points = [basic_corners[[(b + i) % 4 for i in range(4)]][slice(None, None, d*2-1)][:l] + np.random.randn(l, 2) * 0.1 for b, d, l in zip(bases, directions, lengths)]
+    return std::make_tuple(points, directions);
+}

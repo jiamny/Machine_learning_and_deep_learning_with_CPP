@@ -32,7 +32,6 @@ int main() {
 	std::optional<c10::Scalar> max = torch::max(affines).data().item<double>();
 	std::cout << "t:\n" << affines.clip(min, max)  << '\n';
 
-
 	std::ifstream file;
 	std::string path = "./data/diabetes.csv";
 	file.open(path, std::ios_base::in);

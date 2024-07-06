@@ -29,3 +29,13 @@ set_target_properties(ML_P4_other_TSNE PROPERTIES CXX_STANDARD 17 CXX_STANDARD_R
 
 # -------------------------------------------------------------------------------------
 
+add_executable(ML_P4_other_DBSCAN DBSCAN/DBSCAN.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp)
+				
+target_link_libraries(ML_P4_other_DBSCAN ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P4_other_DBSCAN PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
+

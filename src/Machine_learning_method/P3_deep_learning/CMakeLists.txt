@@ -51,4 +51,24 @@ set_target_properties(ML_P3_deep_learning_Ch24_CNN_classifying PROPERTIES CXX_ST
 #set_target_properties(ML_P3_deep_learning_Ch24_tokenizer_example PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
 # -------------------------------------------------------------------------------------
+add_executable(ML_P3_deep_learning_Ch25_Sequences Ch25_RNN/Sequences.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp
+	../../Utils/opencv_helpfunctions.h
+	../../Utils/opencv_helpfunctions.cpp)
+				
+target_link_libraries(ML_P3_deep_learning_Ch25_Sequences ${OpenCV_LIBS} ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P3_deep_learning_Ch25_Sequences PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+add_executable(ML_P3_deep_learning_Ch25_LSTMTagger Ch25_RNN/LSTMTagger.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp
+	../../Utils/opencv_helpfunctions.h
+	../../Utils/opencv_helpfunctions.cpp)
+				
+target_link_libraries(ML_P3_deep_learning_Ch25_LSTMTagger ${OpenCV_LIBS} ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P3_deep_learning_Ch25_LSTMTagger PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+
 

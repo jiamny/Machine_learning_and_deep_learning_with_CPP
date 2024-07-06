@@ -87,4 +87,8 @@ std::string replace_all_char(std::string str, std::string replacement, std::vect
 
 std::vector<std::string> stringSplit(const std::string& str, char delim);
 
+std::vector<std::vector<double>> get_mnist_image(torch::Tensor image);
+
+std::tuple<std::vector<torch::Tensor>, torch::Tensor> generate_sequences(int n=128, bool variable_len=false, int seed=13);
+
 #endif /* HELPFUNCTION_H_ */
