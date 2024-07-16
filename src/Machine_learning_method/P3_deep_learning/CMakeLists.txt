@@ -31,24 +31,13 @@ target_link_libraries(ML_P3_deep_learning_Ch24_CNN_classifying ${OpenCV_LIBS} ${
 set_target_properties(ML_P3_deep_learning_Ch24_CNN_classifying PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
 # -------------------------------------------------------------------------------------
-#add_executable(ML_P3_deep_learning_Ch24_tokenizer_example Ch24_CNN/tokenizer_example.cpp
-#	../../Utils/helpfunction.h
-#	../../Utils/helpfunction.cpp
-#	../../tokenizers/tokenizer.cpp 
-#	../../tokenizers/unilib/unicode.cpp 
-#	../../tokenizers/unilib//uninorms.cpp 
-#	)
-
-#if(Boost_FOUND)
-#    target_link_libraries(ML_P3_deep_learning_Ch24_tokenizer_example ${Boost_LIBRARIES})
-#endif()
-
-#set(unicode_dir "../../tokenizers/unilib") 
-
-#target_include_directories(ML_P3_deep_learning_Ch24_tokenizer_example PUBLIC ${unicode_dir})
+add_executable(ML_P3_deep_learning_Ch24_CNN_text_classification Ch24_CNN/CNN_text_classification.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp
+	)
 		
-#target_link_libraries(ML_P3_deep_learning_Ch24_tokenizer_example ${TORCH_LIBRARIES} matplot)
-#set_target_properties(ML_P3_deep_learning_Ch24_tokenizer_example PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+target_link_libraries(ML_P3_deep_learning_Ch24_CNN_text_classification ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P3_deep_learning_Ch24_CNN_text_classification PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
 # -------------------------------------------------------------------------------------
 add_executable(ML_P3_deep_learning_Ch25_Sequences Ch25_RNN/Sequences.cpp
@@ -69,6 +58,30 @@ add_executable(ML_P3_deep_learning_Ch25_LSTMTagger Ch25_RNN/LSTMTagger.cpp
 				
 target_link_libraries(ML_P3_deep_learning_Ch25_LSTMTagger ${OpenCV_LIBS} ${TORCH_LIBRARIES} matplot)
 set_target_properties(ML_P3_deep_learning_Ch25_LSTMTagger PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+add_executable(ML_P3_deep_learning_Ch26_CNN_seq2seq Ch26_Seq2seq/CNN_seq2seq.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp
+	../../Utils/opencv_helpfunctions.h
+	../../Utils/opencv_helpfunctions.cpp)
+				
+target_link_libraries(ML_P3_deep_learning_Ch26_CNN_seq2seq ${OpenCV_LIBS} ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P3_deep_learning_Ch26_CNN_seq2seq PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+add_executable(ML_P3_deep_learning_Ch26_LSTM_seq2seq Ch26_Seq2seq/LSTM_seq2seq.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp
+	../../Utils/opencv_helpfunctions.h
+	../../Utils/opencv_helpfunctions.cpp)
+				
+target_link_libraries(ML_P3_deep_learning_Ch26_LSTM_seq2seq ${OpenCV_LIBS} ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P3_deep_learning_Ch26_LSTM_seq2seq PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
+
 
 
 

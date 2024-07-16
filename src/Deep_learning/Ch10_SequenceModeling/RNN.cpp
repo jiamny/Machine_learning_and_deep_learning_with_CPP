@@ -250,6 +250,9 @@ int main() {
 	std::cout << "// --------------------------------------------------\n";
 	std::cout << "//Square Model\n";
 	std::cout << "// --------------------------------------------------\n";
+
+	torch::manual_seed(21);
+
 	std::vector<torch::Tensor> test_points;
 	torch::Tensor test_directions;
 	std::tie(test_points, test_directions) = generate_sequences(128, false, 19);
@@ -277,7 +280,6 @@ int main() {
 	auto cuda_available = torch::cuda::is_available();
 	torch::Device device(cuda_available ? torch::kCUDA : torch::kCPU);
 	std::cout << (cuda_available ? "CUDA available. Training on GPU." : "Training on CPU.") << '\n';
-	torch::manual_seed(21);
 
 	SquareModel model = SquareModel(2, 2, 1);
 	model.to(device);

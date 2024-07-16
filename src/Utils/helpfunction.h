@@ -91,4 +91,10 @@ std::vector<std::vector<double>> get_mnist_image(torch::Tensor image);
 
 std::tuple<std::vector<torch::Tensor>, torch::Tensor> generate_sequences(int n=128, bool variable_len=false, int seed=13);
 
+std::pair<torch::nn::Linear, torch::nn::Linear> linear_layers(torch::Tensor Wx, torch::Tensor bx,
+																torch::Tensor Wh, torch::Tensor bh);
+
+// data batch indices
+std::list<std::vector<int>> data_index_iter(int num_examples, int batch_size, bool shuffle = true);
+
 #endif /* HELPFUNCTION_H_ */

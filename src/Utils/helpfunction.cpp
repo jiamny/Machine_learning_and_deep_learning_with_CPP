@@ -259,3 +259,42 @@ std::tuple<std::vector<torch::Tensor>, torch::Tensor> generate_sequences(int n, 
     //points = [basic_corners[[(b + i) % 4 for i in range(4)]][slice(None, None, d*2-1)][:l] + np.random.randn(l, 2) * 0.1 for b, d, l in zip(bases, directions, lengths)]
     return std::make_tuple(points, directions);
 }
+
+std::pair<torch::nn::Linear, torch::nn::Linear> linear_layers(torch::Tensor Wx, torch::Tensor bx,
+																torch::Tensor Wh, torch::Tensor bh) {
+    int hidden_dim = Wx.size(0), n_features = Wx.size(1);
+    torch::nn::Linear lin_input = torch::nn::Linear(torch::nn::LinearOptions(n_features, hidden_dim));
+    torch::nn::Linear lin_hidden = torch::nn::Linear(torch::nn::LinearOptions(hidden_dim, hidden_dim));
+    {
+    	torch::NoGradGuard no_grad;
+    	lin_input->weight = Wx;
+    	lin_input->bias = bx;
+
+    	lin_hidden->weight = Wh;
+    	lin_hidden->bias = bh;
+    }
+
+    return std::make_pair(lin_hidden, lin_input);
+}
+
+// data batch indices
+std::list<std::vector<int>> data_index_iter(int num_examples, int batch_size, bool shuffle) {
+
+	std::list<std::vector<int>> batch_indices;
+	// data index
+	std::vector<int> index;
+	for (int64_t i = 0; i < num_examples; ++i) {
+		index.push_back(i);
+	}
+	// shuffle index
+	if( shuffle ) std::random_shuffle(index.begin(), index.end());
+
+	for (int i = 0; i < index.size(); i +=batch_size) {
+		std::vector<int>::const_iterator first = index.begin() + i;
+		std::vector<int>::const_iterator last = index.begin() + std::min(i + batch_size, num_examples);
+		std::vector<int> indices(first, last);
+
+		batch_indices.push_back(indices);
+	}
+	return( batch_indices );
+}

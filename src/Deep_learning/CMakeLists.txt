@@ -242,7 +242,24 @@ target_link_libraries(DL_Ch10_1D-Convolutions ${TORCH_LIBRARIES} matplot)
 set_target_properties(DL_Ch10_1D-Convolutions PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
 # -------------------------------------------------------------------------------------
+add_executable(DL_Ch10_VariableLengthSequences
+		Ch10_SequenceModeling/VariableLengthSequences.cpp
+		../Utils/helpfunction.h
+		../Utils/helpfunction.cpp)
+				
+target_link_libraries(DL_Ch10_VariableLengthSequences ${TORCH_LIBRARIES} matplot)
+set_target_properties(DL_Ch10_VariableLengthSequences PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
+# -------------------------------------------------------------------------------------
+add_executable(DL_Ch10_Sequence2Sequence
+		Ch10_SequenceModeling/Sequence2Sequence.cpp
+		../Utils/helpfunction.h
+		../Utils/helpfunction.cpp)
+				
+target_link_libraries(DL_Ch10_Sequence2Sequence ${TORCH_LIBRARIES} matplot)
+set_target_properties(DL_Ch10_Sequence2Sequence PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
 
 
 
