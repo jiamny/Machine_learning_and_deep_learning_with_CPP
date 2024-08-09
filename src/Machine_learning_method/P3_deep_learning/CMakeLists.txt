@@ -80,6 +80,29 @@ target_link_libraries(ML_P3_deep_learning_Ch26_LSTM_seq2seq ${OpenCV_LIBS} ${TOR
 set_target_properties(ML_P3_deep_learning_Ch26_LSTM_seq2seq PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
 # -------------------------------------------------------------------------------------
+add_executable(ML_P3_deep_learning_Ch27_AutoEncoder Ch27_Pretrain_NLP_model/AutoEncoder.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp
+	../../Utils/opencv_helpfunctions.h
+	../../Utils/opencv_helpfunctions.cpp
+	../../Utils/fashion.cpp
+	../../Utils/fashion.h)
+				
+target_link_libraries(ML_P3_deep_learning_Ch27_AutoEncoder ${OpenCV_LIBS} ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P3_deep_learning_Ch27_AutoEncoder PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+add_executable(ML_P3_deep_learning_Ch28_Zero_sum_game Ch28_GAN/Zero_sum_game.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp)
+				
+target_link_libraries(ML_P3_deep_learning_Ch28_Zero_sum_game ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P3_deep_learning_Ch28_Zero_sum_game PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
+
+
 
 
 

@@ -208,7 +208,8 @@ std::vector<std::string> stringSplit(const std::string& str, char delim) {
     std::string item;
     std::vector<std::string> elems;
     while (std::getline(ss, item, delim)) {
-        if(!item.empty()) {
+    	item = strip(item);
+        if(! item.empty()) {
             elems.push_back(item);
         }
     }
@@ -298,3 +299,16 @@ std::list<std::vector<int>> data_index_iter(int num_examples, int batch_size, bo
 	}
 	return( batch_indices );
 }
+
+std::string strip( const std::string& s ) {
+	const std::string WHITESPACE = " \n\r\t\f\v";
+
+	size_t start = s.find_first_not_of(WHITESPACE);
+	std::string ls = (start == std::string::npos) ? "" : s.substr(start);
+
+	size_t end = ls.find_last_not_of(WHITESPACE);
+	return (end == std::string::npos) ? "" : ls.substr(0, end + 1);
+}
+
+
+

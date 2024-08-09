@@ -7,89 +7,20 @@
 
 #include <iostream>
 #include <unistd.h>
-
-#include "../../Utils/helpfunction.h"
-#include "../../Utils/TempHelpFunctions.h"
-
-using torch::indexing::Slice;
-using torch::indexing::None;
+#include "Encoder_decoder.h"
 
 #include <matplot/matplot.h>
 using namespace matplot;
 
-namespace F = torch::nn::functional;
-
-class EncoderImpl : public torch::nn::Module {
-public:
-	int n_features = 0;
-	EncoderImpl() {}
-	EncoderImpl(int _n_features, int _hidden_dim) {
-        hidden_dim = _hidden_dim;
-        n_features = _n_features;
-        hidden = torch::empty(0);
-        basic_rnn = torch::nn::GRU(torch::nn::GRUOptions(n_features, hidden_dim).batch_first(true));
-        register_module("basic_rnn", basic_rnn);
-	}
-
-	torch::Tensor forward(torch::Tensor X) {
-    	torch::Tensor rnn_out;
-        std::tie(rnn_out, hidden) = basic_rnn->forward(X);
-        return rnn_out;
-    }
-
-private:
-	int hidden_dim = 0;
-    torch::Tensor hidden;
-    torch::nn::GRU basic_rnn{nullptr};
-};
-TORCH_MODULE(Encoder);
-
-class DecoderImpl : public torch::nn::Module {
-public:
-	torch::Tensor hidden;
-	DecoderImpl() {}
-	DecoderImpl(int _n_features, int _hidden_dim) {
-        hidden_dim = _hidden_dim;
-        n_features = _n_features;
-        hidden = torch::empty(0);
-        //self.basic_rnn = nn.GRU(self.n_features, self.hidden_dim, batch_first=True)
-        basic_rnn = torch::nn::GRU(torch::nn::GRUOptions(n_features, hidden_dim).batch_first(true));
-        register_module("basic_rnn", basic_rnn);
-        regression = torch::nn::Linear(torch::nn::LinearOptions(hidden_dim, n_features));
-        register_module("regression", regression);
-	}
-
-    void init_hidden(torch::Tensor hidden_seq) {
-        // We only need the final hidden state
-    	torch::Tensor hidden_final = hidden_seq.index({Slice(), Slice(-1, None)}); //[:, -1:] # N, 1, H
-        // But we need to make it sequence-first
-        hidden = hidden_final.permute({1, 0, 2}); //# 1, N, H
-    }
-
-    torch::Tensor forward(torch::Tensor X) {
-        // X is N, 1, F
-    	torch::Tensor batch_first_output;
-        std::tie(batch_first_output, hidden) = basic_rnn->forward(X, hidden);
-
-    	torch::Tensor last_output = batch_first_output.index({Slice(), Slice(-1, None)}); //[:, -1:]
-		torch::Tensor out = regression->forward(last_output);
-
-        // N, 1, F
-        return out.view({-1, 1, n_features});
-    }
-
-private:
-    int n_features = 0, hidden_dim = 0;
-    torch::nn::GRU basic_rnn{nullptr};
-    torch::nn::Linear regression{nullptr};
-};
-TORCH_MODULE(Decoder);
-
-class EncoderDecoder : public torch::nn::Module {
+class EncoderDecoderImpl : public torch::nn::Module {
 public:
 	torch::Tensor outputs;
+	Encoder encoder{nullptr};
+	Decoder decoder{nullptr};
+	int input_len = 0, target_len = 0;
+	float teacher_forcing_prob = 0.;
 
-	EncoderDecoder(Encoder _encoder, Decoder _decoder, int _input_len, int _target_len, float _teacher_forcing_prob=0.5) {
+	EncoderDecoderImpl(Encoder _encoder, Decoder _decoder, int _input_len, int _target_len, float _teacher_forcing_prob=0.5) {
         encoder = _encoder;
         decoder = _decoder;
         input_len = _input_len;
@@ -152,13 +83,8 @@ public:
 
         return outputs;
     }
-
-private:
-	Encoder encoder{nullptr};
-	Decoder decoder{nullptr};
-	int input_len = 0, target_len = 0;
-	float teacher_forcing_prob = 0.;
 };
+TORCH_MODULE(EncoderDecoder);
 
 int main() {
 
@@ -254,10 +180,10 @@ int main() {
 	std::cout << "//Encoder + Decoder\n";
 	std::cout << "// --------------------------------------------------\n";
 	EncoderDecoder encdec = EncoderDecoder(encoder, decoder, 2, 2, 1.0);
-	encdec.train();
-	std::cout << "encdec.forward(full_seq):\n" << encdec.forward(full_seq) << '\n';
-	encdec.eval();
-	std::cout << "encdec.forward(source_seq):\n" << encdec.forward(source_seq) << '\n';
+	encdec->train();
+	std::cout << "encdec.forward(full_seq):\n" << encdec->forward(full_seq) << '\n';
+	encdec->eval();
+	std::cout << "encdec.forward(source_seq):\n" << encdec->forward(source_seq) << '\n';
 
 	std::cout << "// --------------------------------------------------\n";
 	std::cout << "//Data Preparation\n";
@@ -294,16 +220,16 @@ int main() {
 	decoder = Decoder(2, 2);
 
 	EncoderDecoder model = EncoderDecoder(encoder, decoder, 2, 2, 0.5);
-	model.to(device);
+	model->to(device);
 
 	auto loss_fnc = torch::nn::MSELoss();
-	auto optimizer = torch::optim::Adam(model.parameters(), 0.01);
+	auto optimizer = torch::optim::Adam(model->parameters(), 0.01);
 
 	int epochs = 100;
 	std::vector<double> train_loss, test_loss, xx;
 
 	for(int  epoch = 0; epoch < epochs; epoch++ ) {
-		model.train();
+		model->train();
 
 		double epoch_train_loss = 0.0;
 		double epoch_test_loss = 0.0;
@@ -315,7 +241,7 @@ int main() {
 			auto X = batch.data.to(device);
 			auto y = batch.target.to(device);
 
-			auto output = model.forward(X);
+			auto output = model->forward(X);
 			auto loss = loss_fnc(output, y);
 			optimizer.zero_grad();           		// clear gradients for this training step
 			loss.backward();						// backpropagation, compute gradients
@@ -324,13 +250,13 @@ int main() {
 		    num_train_samples += X.size(0);
 		}
 
-		model.eval();
+		model->eval();
 
 		for (auto &batch : *test_loader) {
 
 			auto X = batch.data.to(device);
 			auto y = batch.target.to(device);
-			auto output = model.forward(X);
+			auto output = model->forward(X);
 			auto loss = loss_fnc(output, y);
 			epoch_test_loss += loss.data().item<float>();
 			num_test_samples += X.size(0);

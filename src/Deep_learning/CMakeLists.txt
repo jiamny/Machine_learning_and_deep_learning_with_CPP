@@ -260,8 +260,35 @@ target_link_libraries(DL_Ch10_Sequence2Sequence ${TORCH_LIBRARIES} matplot)
 set_target_properties(DL_Ch10_Sequence2Sequence PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
 # -------------------------------------------------------------------------------------
+add_executable(DL_Ch10_Attention
+		Ch10_SequenceModeling/Attention.cpp
+		../Utils/helpfunction.h
+		../Utils/helpfunction.cpp)
+				
+target_link_libraries(DL_Ch10_Attention ${TORCH_LIBRARIES} matplot)
+set_target_properties(DL_Ch10_Attention PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
+# -------------------------------------------------------------------------------------
+add_executable(DL_Ch12_ClassSpecificImageGeneration
+		Ch12_Applications/ClassSpecificImageGeneration.cpp
+		../Utils/helpfunction.h
+		../Utils/helpfunction.cpp
+		../Utils/opencv_helpfunctions.h
+		../Utils/opencv_helpfunctions.cpp)
+				
+target_link_libraries(DL_Ch12_ClassSpecificImageGeneration ${OpenCV_LIBS} ${TORCH_LIBRARIES} matplot)
+set_target_properties(DL_Ch12_ClassSpecificImageGeneration PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
+# -------------------------------------------------------------------------------------
+add_executable(DL_Ch12_NeuralMachineTranslation
+		Ch12_Applications/NeuralMachineTranslation.cpp
+		../Utils/helpfunction.h
+		../Utils/helpfunction.cpp)
+				
+target_link_libraries(DL_Ch12_NeuralMachineTranslation ${TORCH_LIBRARIES} matplot)
+set_target_properties(DL_Ch12_NeuralMachineTranslation PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
 
 
 

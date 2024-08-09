@@ -21,6 +21,8 @@
 #include <numeric>   // iota()
 #include <random>
 #include <tuple>
+#include <regex>
+#include <algorithm>
 #include "TempHelpFunctions.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
@@ -96,5 +98,7 @@ std::pair<torch::nn::Linear, torch::nn::Linear> linear_layers(torch::Tensor Wx, 
 
 // data batch indices
 std::list<std::vector<int>> data_index_iter(int num_examples, int batch_size, bool shuffle = true);
+
+std::string strip( const std::string& s );
 
 #endif /* HELPFUNCTION_H_ */
