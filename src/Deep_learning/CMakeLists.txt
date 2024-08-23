@@ -269,6 +269,24 @@ target_link_libraries(DL_Ch10_Attention ${TORCH_LIBRARIES} matplot)
 set_target_properties(DL_Ch10_Attention PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
 # -------------------------------------------------------------------------------------
+add_executable(DL_Ch11_PracticalMethodology
+		Ch11_PracticalMethodology/PracticalMethodology.cpp
+		../Utils/helpfunction.h
+		../Utils/helpfunction.cpp)
+				
+target_link_libraries(DL_Ch11_PracticalMethodology ${TORCH_LIBRARIES} matplot)
+set_target_properties(DL_Ch11_PracticalMethodology PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+add_executable(DL_Ch11_HyperparameterOptimization
+		Ch11_PracticalMethodology/HyperparameterOptimization.cpp
+		../Utils/helpfunction.h
+		../Utils/helpfunction.cpp)
+				
+target_link_libraries(DL_Ch11_HyperparameterOptimization ${OpenCV_LIBS} ${TORCH_LIBRARIES} matplot)
+set_target_properties(DL_Ch11_HyperparameterOptimization PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
 add_executable(DL_Ch12_ClassSpecificImageGeneration
 		Ch12_Applications/ClassSpecificImageGeneration.cpp
 		../Utils/helpfunction.h

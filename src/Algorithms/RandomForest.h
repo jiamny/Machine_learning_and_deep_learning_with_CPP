@@ -134,8 +134,8 @@ public:
         	std::vector<int> prediction = tree.predict(Xs);
         	torch::Tensor pred =  torch::from_blob(prediction.data(), {static_cast<int64_t>(prediction.size())},
     				at::TensorOptions(torch::kInt32)).clone();
-        	printf("Tree %3d predicted label: ", (i+1));
-        	printVector(tensorTovector(pred.to(torch::kDouble)));
+        	//printf("Tree %3d predicted label: ", (i+1));
+        	//printVector(tensorTovector(pred.to(torch::kDouble)));
 
             y_preds.index_put_({Slice(), i}, pred);
         }

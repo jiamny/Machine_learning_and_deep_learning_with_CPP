@@ -94,7 +94,7 @@ int main() {
 	std::cout << "// --------------------------------------------------\n";
 	std::srand((unsigned) time(NULL));
 
-	int n_estimators = 50, min_features = 5, max_depth = 30;
+	int n_estimators = 4, min_features = 5, max_depth = 30;
     RandomForest model = RandomForest(n_estimators, min_features, max_depth);
     model.fit(train_dt, train_lab);
 
