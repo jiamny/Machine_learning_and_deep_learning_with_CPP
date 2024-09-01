@@ -25,6 +25,18 @@ int main() {
     s->marker_style(line_spec::marker_style::diamond);
     show();
 
+	vector_1d xx = linspace(-2 * pi, 2 * pi);
+	vector_1d yy = linspace(0, 4 * pi);
+	std::cout << "xx: " << xx.size() << " yy: " << yy.size() << '\n';
+    auto [X, Y] = meshgrid(xx, yy);
+    vector_2d Z = transform(X, Y, [](double x, double y) { return sin(x) + cos(y); });
+    std::cout << "X: " << X.size() << " Y: " << Y.size() << '\n';
+    std::cout << "Z: " << Z.size() << " " << Z[0].size() << '\n';
+
+    contour(X, Y, Z);
+
+    show();
+
 	std::cout << "Done!\n";
 	return 0;
 }

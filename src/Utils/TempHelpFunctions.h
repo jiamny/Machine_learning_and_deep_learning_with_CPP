@@ -97,7 +97,7 @@ inline size_t argMax(std::vector<T> a) {
 }
 
 template<typename T>
-std::vector<T> linspace(int start, int end, int length) {
+std::vector<T> linspace(T start, T end, int length) {
 	std::vector<T> vec;
 	T diff = (end - start) / T(length);
 	for (int i = 0; i < length; i++) {
@@ -257,6 +257,19 @@ std::vector<T> flatten(std::vector<std::vector<T>> const &vec)
         flattened.insert(flattened.end(), v.begin(), v.end());
     }
     return flattened;
+}
+
+template<typename V>
+void combinations_with_replacement(V &v, size_t gp_sz, V &gp) {
+    //V gp(gp_sz);
+    auto total_n = std::pow(v.size(), gp.size());
+    for (auto i = 0; i < total_n; ++i) {
+        auto n = i;
+        for (auto j = 0ul; j < gp.size(); ++j) {
+            gp[gp.size() - j - 1] = v[n % v.size()];
+            n /= v.size();
+        }
+    }
 }
 
 #endif /* SRC_UTILS_TEMPHELPFUNCTIONS_HPP_ */

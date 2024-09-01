@@ -23,6 +23,9 @@
 #include <tuple>
 #include <regex>
 #include <algorithm>
+#include <limits.h>
+#include <ctime>
+#include <cstdlib>
 #include "TempHelpFunctions.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
@@ -100,5 +103,33 @@ std::pair<torch::nn::Linear, torch::nn::Linear> linear_layers(torch::Tensor Wx, 
 std::list<std::vector<int>> data_index_iter(int num_examples, int batch_size, bool shuffle = true);
 
 std::string strip( const std::string& s );
+
+double normal_ppf(double p, double mean = 0., double std_dev = 1.);
+
+torch::Tensor rgamma(double alpha, double beta, int size);
+
+class MultivariateNormalx{
+    torch::Tensor mean, stddev, var, L;
+    int d = 0;
+    // Define epsilon.
+    double epsilon = 0.0001;
+public:
+    MultivariateNormalx(const torch::Tensor &mean, const torch::Tensor &std) : mean(mean), stddev(std), var(std * std) {
+      	d = mean.size(0);
+    	// Add small pertturbation.
+    	torch::Tensor K = stddev + epsilon*torch::eye(d).to(torch::kDouble);
+    	// Cholesky decomposition.
+    	L = torch::linalg::cholesky(K);
+    }
+
+    torch::Tensor rsample(int n = 1) {
+    	torch::Tensor u = torch::normal(0., 1., d*n).reshape({d, n}).to(torch::kDouble);
+    	torch::Tensor x = mean + torch::mm(L, u);
+    	return x;
+    }
+};
+
+std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor> train_test_split(torch::Tensor X,
+		torch::Tensor y, double test_size=0.3, bool suffle=true);
 
 #endif /* HELPFUNCTION_H_ */

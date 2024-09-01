@@ -96,6 +96,7 @@ INCLUDE_DIRECTORIES( ${TORCH_INCLUDE_DIRS} )
 # Add  sub-projects:
 add_subdirectory("src/Deep_learning")	
 add_subdirectory("src/Machine_learning_method")
+add_subdirectory("src/Understanding_DL")
 
 
 

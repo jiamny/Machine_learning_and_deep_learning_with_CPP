@@ -307,7 +307,15 @@ target_link_libraries(DL_Ch12_NeuralMachineTranslation ${TORCH_LIBRARIES} matplo
 set_target_properties(DL_Ch12_NeuralMachineTranslation PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
 # -------------------------------------------------------------------------------------
+add_executable(DL_Ch13_Probabilstic_PCA
+		Ch13_Linear_factor_models/Probabilstic_PCA.cpp
+		../Utils/helpfunction.h
+		../Utils/helpfunction.cpp)
+				
+target_link_libraries(DL_Ch13_Probabilstic_PCA ${TORCH_LIBRARIES} matplot)
+set_target_properties(DL_Ch13_Probabilstic_PCA PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
+# -------------------------------------------------------------------------------------
 
 
 
