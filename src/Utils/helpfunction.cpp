@@ -379,8 +379,8 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor> train_tes
 	int train_size = static_cast<int>(num_records * (1 - test_size));
 	x_train = X.index({Slice(0, train_size), Slice()});
 	x_test = X.index({Slice(train_size, None), Slice()});
-	y_train = X.index({Slice(0, train_size), Slice()});
-	y_test = X.index({Slice(train_size, None), Slice()});
+	y_train = y.index({Slice(0, train_size), Slice()});
+	y_test = y.index({Slice(train_size, None), Slice()});
 	return std::make_tuple(x_train, x_test, y_train, y_test);
 }
 

@@ -38,6 +38,8 @@ datasets downloaded from: [OpenML](https://openml.org/)
 
 - [Machine Learning Using Pytorch](https://github.com/Mayurji/MLWithPytorch)
 
+- [Understanding Deep Learning](https://github.com/udlbook/udlbook)
+
 
 ## License
 This repository is licensed under MIT as given in [LICENSE](LICENSE).
