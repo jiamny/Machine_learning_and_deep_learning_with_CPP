@@ -73,6 +73,7 @@ message(STATUS "    version: ${Torch_VERSION}")
 message(STATUS "    libraries: ${TORCH_LIBRARIES}")
 message(STATUS "    include path: ${TORCH_INCLUDE_DIRS}") 
 
+
 # add opencv package to the project
 FIND_PACKAGE( OpenCV 4.8.0 REQUIRED PATHS "/usr/local/")
 INCLUDE_DIRECTORIES( ${OpenCV_INCLUDE_DIRS} ) 

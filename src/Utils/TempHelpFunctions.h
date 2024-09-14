@@ -272,4 +272,51 @@ void combinations_with_replacement(V &v, size_t gp_sz, V &gp) {
     }
 }
 
+// Checks if s2 is a subset of s1.
+template<typename T>
+bool isSubset(std::vector<T> s1, std::vector<T> s2) {
+	bool subSet = true;
+    int i,j;
+    int l1 = s1.size(), l2 = s2.size();
+    for(i=0; i<l2; i++) {
+        for(j=0; j<l1; j++) {
+            if(s2[i]==s1[j])
+                break;
+        }
+        if(j==l1)
+        	return false;
+    }
+    return true;
+}
+
+// remove s1 elements in s2
+template<typename T>
+std::vector<T> subVector(std::vector<T> s1, std::vector<T> s2) {
+
+	for(auto& elementToRemove : s2) {
+	    // Remove the element using erase function and iterators
+	    auto it = std::find(s1.begin(), s1.end(), elementToRemove);
+	    // If element is found found, erase it
+	    if (it != s1.end()) {
+	        s1.erase(it);
+	    }
+	}
+	return s1;
+}
+
+// common elements in s1 and s2
+template<typename T>
+std::vector<T> comVector(std::vector<T> s1, std::vector<T> s2) {
+	std::vector<T> com;
+	for(auto& element : s2) {
+	    // Remove the element using erase function and iterators
+	    auto it = std::find(s1.begin(), s1.end(), element);
+	    // If element is found found, erase it
+	    if (it != s1.end()) {
+	        com.push_back(*it);
+	    }
+	}
+	return com;
+}
+
 #endif /* SRC_UTILS_TEMPHELPFUNCTIONS_HPP_ */

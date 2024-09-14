@@ -2,10 +2,10 @@
  * ShallowNetworks_I.cpp
  *
  *  Created on: Sep 1, 2024
- *      Author: hhj
+ *      Author: jiamny
  */
 
-
+#include <torch/torch.h>
 #include <iostream>
 #include <unistd.h>
 #include <assert.h>
@@ -25,7 +25,7 @@ torch::Tensor ReLU(torch::Tensor x) {
 	if( x.dim() == 1)
 		x = x.reshape({1, -1});
 
-	return torch::where(x >=0.0, x, 0.0);
+	return torch::where(x >= 0.0, x, 0.0);
 }
 
 //Define a shallow neural network with, one input, one output, and three hidden units
