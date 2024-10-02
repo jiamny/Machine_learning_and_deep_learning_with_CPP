@@ -24,58 +24,111 @@ int main() {
 
 	std::cout << "Current path is " << get_current_dir_name() << '\n';
 	torch::manual_seed(123);
-	torch::Tensor affines = torch::ones({2, 2});
-	torch::Tensor mask1 = torch::tensor({{1, 0}, {0, 1}}, torch::kInt32);
-	torch::Tensor mask2 = torch::tensor({{0, 1}, {1, 0}}, torch::kInt32);
-	affines = (affines + 0.2) * mask1 + (affines + 0.8) * mask2;
-	std::optional<c10::Scalar> min = 1e-100;
-	std::optional<c10::Scalar> max = torch::max(affines).data().item<double>();
-	std::cout << "t:\n" << affines.clip(min, max)  << '\n';
 
-	std::ifstream file;
-	std::string path = "./data/diabetes.csv";
-	file.open(path, std::ios_base::in);
+	// Device
+	auto cuda_available = torch::cuda::is_available();
+	torch::Device device(cuda_available ? torch::kCUDA : torch::kCPU);
+	std::cout << (cuda_available ? "CUDA available. Training on GPU." : "Training on CPU.") << '\n';
+
+	std::cout << "// --------------------------------------------------\n";
+	std::cout << "//  Load data\n";
+	std::cout << "// --------------------------------------------------\n";
+
+	std::string file_name = "./data/mnist2500_X.txt";
+	std::string line;
+	std::ifstream fL(file_name.c_str());
+
+	fL.open(file_name, std::ios_base::in);
 
 	// Exit if file not opened successfully
-	if (!file.is_open()) {
+	if (!fL.is_open()) {
 		std::cout << "File not read successfully" << std::endl;
-		std::cout << "Path given: " << path << std::endl;
-		file.close();
+		std::cout << "Path given: " << file_name << std::endl;
 		return -1;
 	}
-
-	int num_records = std::count(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>(), '\n');
-	std::cout << "records in file = " << num_records << '\n';
-
+	int num_records = std::count(std::istreambuf_iterator<char>(fL), std::istreambuf_iterator<char>(), '\n');
+	std::cout << "num_records: " << num_records << '\n';
+	int c = 784;
 	// set file read from begining
-	file.clear();
-	file.seekg(0, std::ios::beg);
+	fL.clear();
+	fL.seekg(0, std::ios::beg);
 
-	std::pair<torch::Tensor, torch::Tensor> datas = process_float_data(file);
-	file.close();
+	std::vector<int> trData;
 
-	torch::Tensor X = datas.first;
-	torch::Tensor y = datas.second;
-	printVector(tensorTovector(X[0].to(torch::kDouble)));
-	std::cout << "y:\n";
-	printVector(tensorTovector(y.to(torch::kDouble)));
+	if( fL.is_open() ) {
+		while ( std::getline(fL, line) ) {
+			line = strip(line);
+			std::vector<std::string> strs = stringSplit(line, ' ');
 
-	TSNE tsne(2, 5.0, 100, 200);
-	torch::Tensor Y = tsne.fit_transform(X);
+			for(int i = 0; i < strs.size(); i++)
+				trData.push_back(std::atoi(strs[i].c_str()));
+		}
+	}
+	fL.close();
 
-	std::cout << "Y:\n" << Y << '\n';
+	torch::Tensor X = torch::from_blob(trData.data(), {num_records, c}, c10::TensorOptions(torch::kInt)).clone();
+	std::cout << "X: " << X.index({Slice(0, 10), Slice(0, 10)}) << " " << X.sizes() << '\n';
 
-	std::vector<double> xx = tensorTovector(Y.index({Slice(), 0}).to(torch::kDouble));
-	std::vector<double> yy = tensorTovector(Y.index({Slice(), 1}).to(torch::kDouble));
-	torch::Tensor zz, _;
-	std::tie(zz, _) = torch::_unique(y);
-	printVector(tensorTovector(zz.to(torch::kDouble)));
+	X = X.to(device);
 
-	auto c = tensorTovector(y.to(torch::kDouble)); //
+	file_name = "./data/mnist2500_labels.txt";
+	std::ifstream fL2(file_name.c_str());
 
-    auto s = matplot::scatter(xx, yy, 14, c);
+	std::vector<int> labels;
+
+	if( fL2.is_open() ) {
+		while ( std::getline(fL2, line) ) {
+			line = strip(line);
+			labels.push_back(std::atoi(line.c_str()));
+		}
+	}
+	fL2.close();
+	std::cout << "labels: " << labels.size() << '\n';
+
+	X = X.to(torch::kDouble);
+
+	torch::Tensor target = torch::from_blob(labels.data(),
+				{static_cast<int>(labels.size())}, c10::TensorOptions(torch::kInt32)).clone();
+
+	TSNE tsne = TSNE(1000);
+
+	torch::NoGradGuard noGrad;
+
+	torch::Tensor Y = tsne.fit_tsne(X, 2, 50, 20.0);
+	Y = Y.cpu();
+
+	std::vector<double> xx, yy;
+	double xmin = 1000, xmax = -1000, ymin = 1000, ymax = -1000;
+	for(auto& i : range(num_records, 0)) {
+		double x = (Y[i][0]).data().item<double>(), y = (Y[i][1]).data().item<double>();
+		if( x < xmin )
+			xmin = x;
+		if( x > xmax )
+			xmax = x;
+
+		if( y < ymin )
+			ymin = y;
+		if( y > ymax )
+			ymax = y;
+
+		xx.push_back(x);
+		yy.push_back(y);
+	}
+	printVector(xx);
+	printVector(yy);
+
+	auto F = figure(true);
+	F->size(1200, 1000);
+	F->add_axes(false);
+	F->reactive_mode(false);
+	F->tiledlayout(1, 1);
+	F->position(0, 0);
+
+	auto fx = F->nexttile();
+    auto s = matplot::scatter(fx, xx, yy, 8, labels);
     s->marker_face(true);
-
+    matplot::xlim(fx, {xmin - 5, xmax + 5});
+    matplot::ylim(fx, {ymin - 5, ymax + 5});
     matplot::show();
 
 	std::cout << "Done!\n";
