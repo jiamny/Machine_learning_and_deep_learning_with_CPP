@@ -19,7 +19,7 @@
 #include <float.h>
 
 #include "../../Utils/TempHelpFunctions.h"
-#include "../../Algorithms/PrincipalComponentsAnalysis.h"
+#include "../../Algorithms/TSNE.h"
 #include "../../Utils/fashion.h"
 #include "../../Utils/helpfunction.h"
 
@@ -78,27 +78,41 @@ void drawFigure(torch::Tensor X_s, torch::Tensor y_s, torch::Tensor T_s, int epo
 	auto cmap = colormap();
 
 	torch::Tensor midx = RangeTensorIndex(y_s.size(0));
+	double xmin = 1000, xmax = -1000, ymin = 1000, ymax = -1000;
 
 	for(auto& i : range(static_cast<int>(unI.size(0)), 0)) {
 		torch::Tensor msk = (y_s == unI[i]);
-		//std::cout << "msk: " << msk.sizes() << '\n';
-		auto mid_x = midx.masked_select(msk);
-			//std::cout << "id_x: " << id_x.sizes() << '\n';
-		//printVector(tensorTovector(mid_x.to(torch::kDouble)));
-		auto mtst_x = torch::index_select(X_s, 0, mid_x.squeeze());
-		//std::cout << "mtst_x: " << mtst_x.sizes() << '\n';
-		//auto mtst_y = test_y.masked_select(msk);
-			//std::cout << "tst_y[0]: " << tst_y[0] << '\n';
-		auto mt_s = torch::index_select(T_s, 0, mid_x.squeeze());
 
-		std::vector<double> xx = tensorTovector(mt_s.index({Slice(), 0}).to(torch::kDouble));
-		std::vector<double> yy = tensorTovector(mt_s.index({Slice(), 1}).to(torch::kDouble));
+		auto mid_x = midx.masked_select(msk);
+
+		auto mtst_x = torch::index_select(X_s, 0, mid_x.squeeze()).clone();
+		auto mt_s = torch::index_select(T_s, 0, mid_x.squeeze()).clone();
+
+		std::vector<double> xx, yy;
+
+		for(auto& j : range(static_cast<int>(mt_s.size(0)), 0)) {
+			double x = (mt_s[j][0]).data().item<double>(), y = (mt_s[j][1]).data().item<double>();
+			if( x < xmin )
+				xmin = x;
+			if( x > xmax )
+				xmax = x;
+
+			if( y < ymin )
+				ymin = y;
+			if( y > ymax )
+				ymax = y;
+			xx.push_back(x);
+			yy.push_back(y);
+		}
+
 		for(auto& j : range(static_cast<int>(xx.size()), 0)) {
 			matplot::text(ax2, xx[j], yy[j],
 					std::to_string(unI[i].data().item<int>()))->color(cmap[i]).font_size(15);
 		}
 	}
-	title(ax2, "After epoch: " + std::to_string(epoch) + " training");
+	title(ax2, "After training epoch: " + std::to_string(epoch));
+    xlim(ax2, {xmin - 5, xmax + 5});
+    ylim(ax2, {ymin - 5, ymax + 5});
 	ax2->draw();
 }
 
@@ -173,9 +187,11 @@ int main() {
 					         std::move(train_dataset), batch_size);
 
 
-	FASHION test_data(FASHION_data_path, FASHION::Mode::kTest);
-	at::Tensor test_x = train_datas.images().index({Slice(0, 2000), Slice()});
-	torch::Tensor test_y = train_datas.targets().index({Slice(0, 2000)});
+	FASHION test_datas(FASHION_data_path, FASHION::Mode::kTest);
+	std::cout << "num_test_samples: " << test_datas.images().size(0) << std::endl;
+
+	at::Tensor test_x = test_datas.images().index({Slice(0, 2000), Slice()});
+	torch::Tensor test_y = test_datas.targets().index({Slice(0, 2000)});
 
 	if (show_image ) {
 		torch::Tensor mask = (test_y == 4);
@@ -220,6 +236,8 @@ int main() {
 	F2->position(0, 0);
 	auto ax2 = F2->nexttile();
 
+	TSNE tsne = TSNE(500);
+
 	for(auto& epoch : range(num_epochs, 0)) {
 
 		cnn.train();
@@ -249,15 +267,19 @@ int main() {
         printf("Epoch: %d | train loss: %.4f, | test accuracy: %.2f\n", (epoch+1),
         		(ls/step), accuracy.data().item<float>());
 
-		PCA pca(2);
-		torch::Tensor X_s = last_layer.cpu().index({Slice(0, 200), Slice()});
-		torch::Tensor y_s = test_y.index({Slice(0, 200)});
-		torch::Tensor T_s = pca.fit_transform(X_s);
+		torch::Tensor X_s = last_layer.clone();
+		torch::Tensor y_s = test_y.clone();
+		std::cout << "test_y: " << test_y.sizes() << '\n';
+
 		std::cout << "// --------------------------------------------------\n";
-		std::cout << "// reduction last_layer data with PCA\n";
+		std::cout << "// Reduction last_layer data with TSNE\n";
 		std::cout << "// --------------------------------------------------\n";
 
-		drawFigure(X_s, y_s, T_s, (epoch+1), ax2);
+		torch::NoGradGuard noGrad;
+		torch::Tensor T_s = tsne.fit_tsne(X_s, 2, 50, 20.0);
+
+		ax2->clear();
+		drawFigure(X_s.cpu().clone(), y_s, T_s.cpu().clone(), (epoch+1), ax2);
 	}
 	matplot::show();
 

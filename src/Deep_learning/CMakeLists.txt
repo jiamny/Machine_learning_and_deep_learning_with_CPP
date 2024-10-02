@@ -316,6 +316,17 @@ target_link_libraries(DL_Ch13_Probabilstic_PCA ${TORCH_LIBRARIES} matplot)
 set_target_properties(DL_Ch13_Probabilstic_PCA PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
 # -------------------------------------------------------------------------------------
+add_executable(DL_Ch14_RegularizedAutoEncoder
+		Ch14_Autoencoders/RegularizedAutoEncoder.cpp
+		../Utils/helpfunction.h
+		../Utils/helpfunction.cpp
+		../Utils/fashion.h
+		../Utils/fashion.cpp)
+				
+target_link_libraries(DL_Ch14_RegularizedAutoEncoder ${TORCH_LIBRARIES} matplot)
+set_target_properties(DL_Ch14_RegularizedAutoEncoder PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
 
 
 
