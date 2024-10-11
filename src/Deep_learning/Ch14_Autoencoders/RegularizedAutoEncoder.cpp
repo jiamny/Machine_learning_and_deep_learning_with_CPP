@@ -155,7 +155,7 @@ struct AutoEncoderImpl : public torch::nn::Module {
 		enc = encoder;
 		dec = decoder;
 		register_module("enc", enc);
-		register_module("decc", dec);
+		register_module("dec", dec);
 	}
 
 	torch::Tensor forward(torch::Tensor x) {

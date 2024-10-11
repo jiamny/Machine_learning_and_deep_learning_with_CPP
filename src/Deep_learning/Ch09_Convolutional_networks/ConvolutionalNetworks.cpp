@@ -274,7 +274,7 @@ int main() {
 		std::cout << "// --------------------------------------------------\n";
 		std::cout << "// Reduction last_layer data with TSNE\n";
 		std::cout << "// --------------------------------------------------\n";
-
+		std::cout << "X_s: " << X_s.device() << '\n';
 		torch::NoGradGuard noGrad;
 		torch::Tensor T_s = tsne.fit_tsne(X_s, 2, 50, 20.0);
 

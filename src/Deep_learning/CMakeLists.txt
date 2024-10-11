@@ -327,6 +327,18 @@ target_link_libraries(DL_Ch14_RegularizedAutoEncoder ${TORCH_LIBRARIES} matplot)
 set_target_properties(DL_Ch14_RegularizedAutoEncoder PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
 # -------------------------------------------------------------------------------------
+add_executable(DL_Ch14_DenoisingAutoencoder
+		Ch14_Autoencoders/DenoisingAutoencoder.cpp
+		../Utils/helpfunction.h
+		../Utils/helpfunction.cpp
+		../Utils/fashion.h
+		../Utils/fashion.cpp)
+				
+target_link_libraries(DL_Ch14_DenoisingAutoencoder ${TORCH_LIBRARIES} matplot)
+set_target_properties(DL_Ch14_DenoisingAutoencoder PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
 
 
 

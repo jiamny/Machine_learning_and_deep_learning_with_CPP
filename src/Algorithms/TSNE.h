@@ -41,22 +41,25 @@ public:
 
 	    // Compute P-row and corresponding perplexity
 		// avoid nan
-		if( std::isnan(torch::sum(torch::exp(-1.0*D.clone() * beta)).data().item<double>()))
-			D = torch::maximum(D, torch::tensor({1e-12}));
+		torch::Tensor a = torch::tensor({1e-12}).to(D.device());
+		torch::Tensor t = torch::sum(torch::exp(-1.0*D.clone() * beta));
+		if( std::isnan(t.cpu().data().item<double>()))
+			D = torch::maximum(D, torch::tensor({1e-12}).to(D.dtype()));
 
-		torch::Tensor P = torch::exp(-1.0*D.clone() * beta);
+		torch::Tensor P = torch::exp(-1.0*D.clone() * beta).to(D.dtype());
+
+		t = (torch::log(torch::sum(P)) + beta * torch::sum(D * P) / torch::sum(P));
 
 		// avoid nan
-		if( std::isnan((torch::log(torch::sum(P)) + beta * torch::sum(D * P) / torch::sum(P)).data().item<double>()))
-			P = torch::maximum(P, torch::tensor({1e-12}));
+		if( std::isnan(t.cpu().data().item<double>()))
+			P = torch::maximum(P, a);
 
 		torch::Tensor sumP = torch::sum(P);
-
-		torch::Tensor H = torch::log(sumP) + beta * torch::sum(D * P) / sumP;
+		torch::Tensor H = (torch::log(sumP) + beta * torch::sum(D * P) / sumP).to(D.dtype());
 
 		// avoid nan
-		if( std::isnan(torch::sum(P/sumP).data().item<double>()))
-			P = torch::maximum(P, torch::tensor({1e-12}));
+		if( std::isnan(torch::sum(P/sumP).cpu().data().item<double>()))
+			P = torch::maximum(P, a);
 
 		P = P / sumP;
 
@@ -71,10 +74,9 @@ public:
 	    std::cout << "Computing pairwise distances...\n";
 	    int n = X.size(0), d = X.size(1);
 	    c10::OptionalArrayRef<long int> dim = {1};
-	    torch::Tensor sum_X = torch::sum(torch::square(X), dim);
-	    std::cout << "std::isnan(sum_X): " << std::isnan(torch::sum(sum_X).data().item<double>()) << '\n';
-	    torch::Tensor D = torch::add(torch::add(-2 * torch::mm(X, X.t()), sum_X).t(), sum_X);
-	    std::cout << "std::isnan(D): " << std::isnan(torch::sum(D).data().item<double>()) << '\n';
+	    torch::Tensor sum_X = torch::sum(torch::square(X), dim).to(X.dtype());
+
+	    torch::Tensor D = torch::add(torch::add(-2 * torch::mm(X, X.t()), sum_X).t(), sum_X).to(X.dtype());
 
 	    torch::Tensor P = torch::zeros({n, n}).to(X.dtype()).to(X.device());
 	    torch::Tensor beta = torch::ones({n, 1}).to(X.dtype()).to(X.device());
@@ -191,13 +193,13 @@ public:
 	    torch::Tensor P = x2p(X, 1e-5, perplexity);
 	    P = P + P.t();
 		// avoid nan
-		if( std::isnan(torch::sum(P).data().item<double>()))
-			P = torch::maximum(P, torch::tensor({1e-12}));
+		if( std::isnan(torch::sum(P).cpu().data().item<double>()))
+			P = torch::maximum(P, torch::tensor({1e-12}).to(X.device()));
 
 	    P = P / torch::sum(P);
 	    P = P * 4.;    			// early exaggeration
 
-	    P = torch::maximum(P, torch::tensor({1e-21}));
+	    P = torch::maximum(P, torch::tensor({1e-21}).to(X.device()));
 
 	    // Run iterations
 	    for(auto& iter : range(max_iter, 0)) {
@@ -210,7 +212,7 @@ public:
 	        num.index_put_({torch::arange(n), torch::arange(n)}, 0.);
 
 	        torch::Tensor Q = num / torch::sum(num);
-	        Q = torch::maximum(Q, torch::tensor({1e-12}));
+	        Q = torch::maximum(Q, torch::tensor({1e-12}).to(X.device()));
 
 	        // Compute gradient
 	        torch::Tensor PQ = P - Q;

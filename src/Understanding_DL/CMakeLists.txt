@@ -108,7 +108,18 @@ target_link_libraries( UDL_Ch04_3_Deep_Networks ${TORCH_LIBRARIES} matplot)
 set_target_properties( UDL_Ch04_3_Deep_Networks PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
 # -------------------------------------------------------------------------------------
+# add executable
+add_executable( UDL_Ch05_1_Least_Squares_Loss
+	Ch05_Loss_functions/C5_1_Least_Squares_Loss.cpp
+	../Utils/helpfunction.h
+	../Utils/helpfunction.cpp
+)
 
+# link libraries
+target_link_libraries( UDL_Ch05_1_Least_Squares_Loss ${TORCH_LIBRARIES} matplot)
+set_target_properties( UDL_Ch05_1_Least_Squares_Loss PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
 
 
 
