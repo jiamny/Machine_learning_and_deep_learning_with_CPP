@@ -19,6 +19,7 @@ using torch::indexing::None;
 #include <matplot/matplot.h>
 using namespace matplot;
 
+
 // Define the Rectified Linear Unit (ReLU) function
 torch::Tensor ReLU(torch::Tensor x) {
 
@@ -27,6 +28,7 @@ torch::Tensor ReLU(torch::Tensor x) {
 
 	return torch::where(x >=0.0, x, 0.0);
 }
+
 
 torch::Tensor heaviside(torch::Tensor z) {
     if( z.dim() == 1)

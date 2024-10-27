@@ -48,14 +48,13 @@ public:
 
 class _Softmax : public ActivationBase {
 public:
-	_Softmax() {};;
+	_Softmax(long int dim = 0) {dm = dim;};
 
 	torch::Tensor forward(torch::Tensor X) {
-		torch::Tensor val_max, _;
-		std::tie(val_max, _) = torch::max(X, -1, true);
+		torch::Tensor val_max = torch::max(X);
 		torch::Tensor X_exp = torch::exp(X - val_max);
 
-		c10::OptionalArrayRef<long int> dim = {1};
+		c10::OptionalArrayRef<long int> dim = {dm};
 		torch::Tensor partition = torch::sum(X_exp, dim, true);
 		return (X_exp / partition);
 	}
@@ -64,6 +63,8 @@ public:
 		torch::Tensor p = forward(X);
         return p * (1. - p);
 	}
+private:
+	long int dm = 0;
 };
 
 class _ReLU : public ActivationBase {

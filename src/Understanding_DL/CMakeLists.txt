@@ -120,6 +120,56 @@ target_link_libraries( UDL_Ch05_1_Least_Squares_Loss ${TORCH_LIBRARIES} matplot)
 set_target_properties( UDL_Ch05_1_Least_Squares_Loss PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
 # -------------------------------------------------------------------------------------
+# add executable
+add_executable( UDL_Ch05_2_Binary_Cross_Entropy_Loss
+	Ch05_Loss_functions/C5_2_Binary_Cross_Entropy_Loss.cpp
+	../Utils/helpfunction.h
+	../Utils/helpfunction.cpp
+)
+
+# link libraries
+target_link_libraries( UDL_Ch05_2_Binary_Cross_Entropy_Loss ${TORCH_LIBRARIES} matplot)
+set_target_properties( UDL_Ch05_2_Binary_Cross_Entropy_Loss PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+# add executable
+add_executable( UDL_Ch05_3_Multiclass_Cross_entropy_Loss
+	Ch05_Loss_functions/C5_3_Multiclass_Cross_entropy_Loss.cpp
+	../Utils/helpfunction.h
+	../Utils/helpfunction.cpp
+)
+
+# link libraries
+target_link_libraries( UDL_Ch05_3_Multiclass_Cross_entropy_Loss ${TORCH_LIBRARIES} matplot)
+set_target_properties( UDL_Ch05_3_Multiclass_Cross_entropy_Loss PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+# add executable
+add_executable( UDL_Ch06_1_Line_Search
+	Ch06_Fitting_models/C6_1_Line_Search.cpp
+	../Utils/helpfunction.h
+	../Utils/helpfunction.cpp
+)
+
+# link libraries
+target_link_libraries( UDL_Ch06_1_Line_Search ${TORCH_LIBRARIES} matplot)
+set_target_properties( UDL_Ch06_1_Line_Search PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+# add executable
+add_executable( UDL_Ch06_2_Gradient_Descent
+	Ch06_Fitting_models/C6_2_Gradient_Descent.cpp
+	../Utils/helpfunction.h
+	../Utils/helpfunction.cpp
+)
+
+# link libraries
+target_link_libraries( UDL_Ch06_2_Gradient_Descent ${TORCH_LIBRARIES} matplot)
+set_target_properties( UDL_Ch06_2_Gradient_Descent PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
+
 
 
 

@@ -63,5 +63,18 @@ target_link_libraries(ML_P4_other_ElasticNetRegression ${TORCH_LIBRARIES} matplo
 set_target_properties(ML_P4_other_ElasticNetRegression PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
 # -------------------------------------------------------------------------------------
+add_executable(ML_P4_other_K_Medoids K_Medoids/K_Medoids.cpp
+	../../Utils/helpfunction.h
+	../../Utils/helpfunction.cpp)
+				
+target_link_libraries(ML_P4_other_K_Medoids ${TORCH_LIBRARIES} matplot)
+set_target_properties(ML_P4_other_K_Medoids PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
+
+
+
+
 
 
