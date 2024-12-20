@@ -49,6 +49,18 @@ void draw_function(torch::Tensor (*loss_function)(torch::Tensor), torch::Tensor 
     	matplot::plot(fx, std::vector<double> {b.data().item<double>(), b.data().item<double>()}, std::vector<double> {0,1}, "b-")->line_width(2);
     	matplot::plot(fx, std::vector<double> {c.data().item<double>(), c.data().item<double>()}, std::vector<double> {0,1}, "b-")->line_width(2);
     	matplot::plot(fx, std::vector<double> {d.data().item<double>(), d.data().item<double>()}, std::vector<double> {0,1}, "b-")->line_width(2);
+    	auto [ta, la] = matplot::textarrow(fx, a.data().item<double>() - 0.15, 0.05, a.data().item<double>(), 0, "a");
+    	auto [tb, lb] = matplot::textarrow(fx, b.data().item<double>() - 0.2, 0.1, b.data().item<double>(), 0, "b");
+    	auto [tc, lc] = matplot::textarrow(fx, c.data().item<double>() + 0.2, 0.05, c.data().item<double>(), 0, "c");
+    	auto [td, ld] = matplot::textarrow(fx, d.data().item<double>() + 0.15, 0.1, d.data().item<double>(), 0, "d");
+    	ta->color("red").font_size(14);
+    	la->color("k");
+    	tb->color("red").font_size(14);
+    	lb->color("k");
+    	tc->color("red").font_size(14);
+    	lc->color("k");
+    	td->color("red").font_size(14);
+    	ld->color("k");
     }
 
     matplot::show();
@@ -65,8 +77,6 @@ double line_search(torch::Tensor (*loss_function)(torch::Tensor), float thresh=.
 
     // While we haven't found the minimum closely enough
     while( std::abs(b-c) > thresh && n_iter < max_iter) {
-        // Increment iteration counter (just to prevent an infinite loop)
-        n_iter = n_iter+1;
 
         // Calculate all four points
         double  lossa = loss_function(torch::tensor({a})).data().item<double>();
@@ -74,8 +84,11 @@ double line_search(torch::Tensor (*loss_function)(torch::Tensor), float thresh=.
         double  lossc = loss_function(torch::tensor({c})).data().item<double>();
         double  lossd = loss_function(torch::tensor({d})).data().item<double>();
 
-        if( draw_flag )
+        if( draw_flag &&  n_iter % 5 == 0)
           draw_function(loss_function, torch::tensor({a}), torch::tensor({b}), torch::tensor({c}), torch::tensor({d}));
+
+        // Increment iteration counter (just to prevent an infinite loop)
+        n_iter = n_iter+1;
 
         printf("Iter %d, a=%3.3f, b=%3.3f, c=%3.3f, d=%3.3f\n", n_iter, a, b, c, d);
 

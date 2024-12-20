@@ -124,7 +124,7 @@ public:
 
     torch::Tensor rsample(int n = 1) {
     	torch::Tensor u = torch::normal(0., 1., d*n).reshape({d, n}).to(torch::kDouble);
-    	torch::Tensor x = mean + torch::mm(L, u);
+    	torch::Tensor x = mean.reshape({d, 1}) + torch::mm(L, u);
     	return x;
     }
 };
