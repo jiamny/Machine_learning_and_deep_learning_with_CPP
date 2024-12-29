@@ -93,21 +93,21 @@ std::tuple<std::vector<torch::Tensor>, std::vector<torch::Tensor>> backward_pass
 
 	// Now work backwards through the network
 	for(int layer = K; layer >= 0; layer += -1) {
-	    // TODO Calculate the derivatives of the loss with respect to the biases at layer from all_dl_df[layer]. (eq 7.21)
+	    // Calculate the derivatives of the loss with respect to the biases at layer from all_dl_df[layer]. (eq 7.21)
 	    // NOTE!  To take a copy of matrix X, use Z=np.array(X)
 	    all_dl_dbiases[layer] = all_dl_df[layer];
 
-	    // TODO Calculate the derivatives of the loss with respect to the weights at layer from
+	    // Calculate the derivatives of the loss with respect to the weights at layer from
 	    // all_dl_df[layer] and all_h[layer] (eq 7.22). Don't forget to use matmul
 	    all_dl_dweights[layer] = torch::matmul(all_dl_df[layer], all_h[layer].t());
 
-	    // TODO: calculate the derivatives of the loss with respect to the activations from weight
+	    // calculate the derivatives of the loss with respect to the activations from weight
 		// and derivatives of next preactivations (second part of last line of eq 7.24)
 	    all_dl_dh[layer] = torch::matmul(all_weights[layer].t(), all_dl_df[layer]);
 
 
 	    if( layer > 0) {
-	    	// TODO Calculate the derivatives of the loss with respect to the pre-activation
+	    	//  Calculate the derivatives of the loss with respect to the pre-activation
 	    	// f (use derivative of ReLu function, first part of last line of eq. 7.24)
 	    	all_dl_df[layer-1] = indicator_function(all_f[layer - 1]) * all_dl_dh[layer];
 	    }

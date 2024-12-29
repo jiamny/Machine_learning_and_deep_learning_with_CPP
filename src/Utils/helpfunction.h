@@ -132,4 +132,6 @@ public:
 std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor> train_test_split(torch::Tensor X,
 		torch::Tensor y, double test_size=0.3, bool suffle=true);
 
+std::tuple<torch::Tensor, torch::Tensor> load_mnist1d(bool isTrain=true);
+
 #endif /* HELPFUNCTION_H_ */

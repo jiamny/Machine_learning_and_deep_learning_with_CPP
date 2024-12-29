@@ -384,3 +384,56 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor> train_tes
 	return std::make_tuple(x_train, x_test, y_train, y_test);
 }
 
+std::tuple<torch::Tensor, torch::Tensor> load_mnist1d(bool isTrain) {
+	torch::Tensor X, y;
+	// Load CSV data
+	std::ifstream file;
+	std::string x_path = "./data/mnist1d/mnist1d_data_train_x.csv";
+	std::string y_path = "./data/mnist1d/mnist1d_data_train_y.csv";
+	if( ! isTrain ) {
+		x_path = "./data/mnist1d/mnist1d_data_test_x.csv";
+		y_path = "./data/mnist1d/mnist1d_data_test_y.csv";
+	}
+
+	std::vector<float> x_data;
+	std::vector<int> y_data;
+	std::string line;
+
+	file.open(x_path, std::ios_base::in);
+	if( file.is_open() ) {
+		 //std::getline(file, line); // skip header
+		while ( std::getline(file, line) ) {
+			line = strip(line);
+			std::vector<std::string> strs = stringSplit(line, ',');
+			for(auto& i : strs)
+				x_data.push_back(std::atof(strip(i).c_str()));
+		}
+	} else {
+		std::cout << x_path << " not exists!\n";
+	}
+
+	file.close();
+
+	file.open(y_path, std::ios_base::in);
+	if( file.is_open() ) {
+		 //std::getline(file, line); // skip header
+		while ( std::getline(file, line) ) {
+			line = strip(line);
+			std::vector<std::string> strs = stringSplit(line, ',');
+			y_data.push_back(std::atoi(strip(strs[0]).c_str()));
+		}
+	} else {
+		std::cout << y_path << " not exists!\n";
+	}
+
+	file.close();
+
+	y = torch::from_blob(y_data.data(), {static_cast<int>(y_data.size()), 1},
+											  at::TensorOptions(torch::kInt)).clone();
+	X = torch::from_blob(x_data.data(), {static_cast<int>(y_data.size()),
+											  static_cast<int>(x_data.size()/y_data.size())},
+											  at::TensorOptions(torch::kFloat32)).clone();
+
+	return std::make_tuple(X, y);
+}
+

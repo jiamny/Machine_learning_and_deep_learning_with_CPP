@@ -86,8 +86,8 @@ int main() {
 		int num_batch = 0;
 		// loop over batches
 		for (auto &batch : *data_loader) {
-			auto x_batch = batch.data.to(device);;
-			auto y_batch = batch.target.to(device);;
+			auto x_batch = batch.data.to(device);
+			auto y_batch = batch.target.to(device);
 
 			// zero the parameter gradients
 			optimizer.zero_grad();
@@ -123,7 +123,7 @@ int main() {
 	auto fx = F->nexttile();
 	matplot::plot(fx, xx, yy,"-")->line_width(3);
 	matplot::xlabel("epoch");
-	matplot::xlabel("loss");
+	matplot::ylabel("loss");
 	matplot::show();
 
 	std::cout << "Done!\n";

@@ -80,7 +80,7 @@ std::tuple<torch::Tensor, std::vector<torch::Tensor>, std::vector<torch::Tensor>
   }
 
   // Compute the output from the last hidden layer
-  //# TO DO -- Replace the line below
+  //# -- Replace the line below
   all_f[K] = all_biases[K] + torch::matmul(all_weights[K], all_h[K]);
 
   // Retrieve the output

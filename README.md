@@ -6,6 +6,8 @@ The objective of the repository is to implement different well-known machine lea
 
 - Machine learning method (Author: Li Hang)
 
+- Understanding Deep Learning (Author: Simon J.D. Prince)
+
 ## Dependency
 
 - cmake 3.18+

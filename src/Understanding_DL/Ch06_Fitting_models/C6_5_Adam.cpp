@@ -135,13 +135,13 @@ torch::Tensor adam(torch::Tensor start_posn, int n_steps, float alpha,  float be
         // Measure the gradient
     	torch::Tensor grad = get_loss_gradient(grad_path[0][c_step].data().item<float>(),
 											   grad_path[1][c_step].data().item<float>());
-        // TODO -- Update the momentum based gradient estimate equation 6.15 (first line)
+        //  -- Update the momentum based gradient estimate equation 6.15 (first line)
 		m = beta * m + (1.0 - beta) * grad;
 
-        // TODO -- update the momentum based squared gradient estimate as in equation 6.15 (second line)
+        // -- update the momentum based squared gradient estimate as in equation 6.15 (second line)
     	v = gamma * v + (1.0 - gamma) * torch::pow(grad, 2);
 
-        // TODO -- Modify the statistics according to equation 6.16
+        //  -- Modify the statistics according to equation 6.16
     	torch::Tensor m_tilde = m / (1.0 - std::pow(beta, c_step + 1));
     	torch::Tensor v_tilde = v / (1.0 - std::pow(gamma, c_step + 1));
 
