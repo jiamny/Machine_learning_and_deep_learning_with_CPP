@@ -10,7 +10,7 @@ project(Machine_learning_and_deep_learning_with_CPP VERSION 1.0.0 LANGUAGES CXX)
 add_subdirectory(matplotplusplus)
 
 
-set(PYTORCH_VERSION "2.4.0")
+set(PYTORCH_VERSION "2.5.1")
 
 set(USE_CPU_ONLY NO)
 

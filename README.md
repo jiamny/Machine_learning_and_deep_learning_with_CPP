@@ -12,7 +12,7 @@ The objective of the repository is to implement different well-known machine lea
 
 - cmake 3.18+
 
-- PyTorch 2.4.0
+- PyTorch 2.5.1
 
 - NVIDIA CUDA 11.8
 
