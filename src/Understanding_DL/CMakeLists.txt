@@ -172,7 +172,9 @@ set_target_properties( UDL_Ch06_2_Gradient_Descent PROPERTIES CXX_STANDARD 17 CX
 add_executable( UDL_Ch06_3_Stochastic_Gradient_Descent
 	Ch06_Fitting_models/C6_3_Stochastic_Gradient_Descent.cpp
 	../Utils/helpfunction.h
+	../Utils/UDL_util.h
 	../Utils/helpfunction.cpp
+	../Utils/UDL_util.cpp
 )
 
 # link libraries
@@ -300,6 +302,47 @@ target_link_libraries( UDL_Ch08_4_High_dimensional_spaces ${TORCH_LIBRARIES} mat
 set_target_properties( UDL_Ch08_4_High_dimensional_spaces PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
 # -------------------------------------------------------------------------------------
+# add executable
+add_executable( UDL_Ch09_1_L2_Regularization
+	Ch09_Regularization/C9_1_L2_Regularization.cpp
+	../Utils/helpfunction.h
+	../Utils/helpfunction.cpp
+	../Utils/UDL_util.h
+	../Utils/UDL_util.cpp
+)
+
+# link libraries
+target_link_libraries( UDL_Ch09_1_L2_Regularization ${TORCH_LIBRARIES} matplot)
+set_target_properties( UDL_Ch09_1_L2_Regularization PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+# add executable
+add_executable( UDL_Ch09_2_Implicit_regularization
+	Ch09_Regularization/C9_2_Implicit_regularization.cpp
+	../Utils/helpfunction.h
+	../Utils/helpfunction.cpp
+	../Utils/UDL_util.h
+	../Utils/UDL_util.cpp
+)
+
+# link libraries
+target_link_libraries( UDL_Ch09_2_Implicit_regularization ${TORCH_LIBRARIES} matplot)
+set_target_properties( UDL_Ch09_2_Implicit_regularization PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+# add executable
+add_executable( UDL_Ch09_3_Ensembling
+	Ch09_Regularization/C9_3_Ensembling.cpp
+	../Utils/helpfunction.h
+	../Utils/helpfunction.cpp
+)
+
+# link libraries
+target_link_libraries( UDL_Ch09_3_Ensembling ${TORCH_LIBRARIES} matplot)
+set_target_properties( UDL_Ch09_3_Ensembling PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+
 
 
 
