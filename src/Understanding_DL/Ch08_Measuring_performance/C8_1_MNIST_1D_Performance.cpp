@@ -21,7 +21,7 @@ using torch::indexing::None;
 using namespace matplot;
 
 
-// He initialization of weights
+// Initialization of weights
 void weights_init(torch::nn::Sequential& modules){
 	for(auto& module : modules->modules((/*include_self=*/false))) {
 		if (auto M = dynamic_cast<torch::nn::Conv2dImpl*>(module.get())) {
@@ -44,7 +44,7 @@ int main() {
 	// Device
 	auto cuda_available = torch::cuda::is_available();
 	torch::Device device(cuda_available ? torch::kCUDA : torch::kCPU);
-	std::cout << (cuda_available ? "CUDA available. Training on GPU." : "Training on CPU.") << '\n';
+	std::cout << (cuda_available ? "CUDA available." : "Training on CPU.") << '\n';
 
 	std::cout << "// ------------------------------------------------------------------------\n";
 	std::cout << "// Load data sets\n";
@@ -89,7 +89,7 @@ int main() {
 	auto scheduler = torch::optim::StepLR(optimizer, 10, 0.5);
 
 	// loop over the dataset n_epoch times
-	int n_epoch = 50;
+	int n_epoch = 100;
 
 	// store the loss and the % correct at each epoch
 	std::vector<double> losses_train, errors_train, losses_test, errors_test, xx;

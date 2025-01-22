@@ -102,7 +102,7 @@ float get_reg_term(float phi0, float phi1, float alpha){
 
 	float ls0 = ls[0][0].data().item<float>();
 	float ls1 = ls[1][0].data().item<float>();
-	float reg_term = (alpha/4.0)*(ls0*ls0 + ls1*ls1);
+	float reg_term = (alpha/4.0)*std::sqrt(ls0*ls0 + ls1*ls1);
 
     return reg_term;
 }

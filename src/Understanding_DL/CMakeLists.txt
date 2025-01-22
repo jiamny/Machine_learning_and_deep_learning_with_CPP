@@ -335,6 +335,8 @@ add_executable( UDL_Ch09_3_Ensembling
 	Ch09_Regularization/C9_3_Ensembling.cpp
 	../Utils/helpfunction.h
 	../Utils/helpfunction.cpp
+	../Utils/UDL_util.h
+	../Utils/UDL_util.cpp
 )
 
 # link libraries
@@ -342,7 +344,32 @@ target_link_libraries( UDL_Ch09_3_Ensembling ${TORCH_LIBRARIES} matplot)
 set_target_properties( UDL_Ch09_3_Ensembling PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
 
 # -------------------------------------------------------------------------------------
+# add executable
+add_executable( UDL_Ch09_4_Bayesian_approach
+	Ch09_Regularization/C9_4_Bayesian_approach.cpp
+	../Utils/helpfunction.h
+	../Utils/helpfunction.cpp
+	../Utils/UDL_util.h
+	../Utils/UDL_util.cpp
+)
 
+# link libraries
+target_link_libraries( UDL_Ch09_4_Bayesian_approach ${TORCH_LIBRARIES} matplot)
+set_target_properties( UDL_Ch09_4_Bayesian_approach PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
+# add executable
+add_executable( UDL_Ch09_5_Augmentation
+	Ch09_Regularization/C9_5_Augmentation.cpp
+	../Utils/helpfunction.h
+	../Utils/helpfunction.cpp
+)
+
+# link libraries
+target_link_libraries( UDL_Ch09_5_Augmentation ${TORCH_LIBRARIES} matplot)
+set_target_properties( UDL_Ch09_5_Augmentation PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES)
+
+# -------------------------------------------------------------------------------------
 
 
 

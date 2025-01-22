@@ -12,6 +12,9 @@
 #include <matplot/matplot.h>
 using namespace matplot;
 
+// ------------------------------------------------------------------------
+// Chapter 6-3 Stochastic_Gradient_Descent & Chapter 9-1 L2_Regularization
+// ------------------------------------------------------------------------
 // Gabor model definition
 torch::Tensor model(torch::Tensor phi, torch::Tensor x) {
 	torch::Tensor sin_component = torch::sin(phi[0] + 0.06 * phi[1] * x);
@@ -155,4 +158,101 @@ void draw_loss_function(torch::Tensor (*compute_loss)(torch::Tensor, torch::Tens
 	matplot::show();
 }
 
+// ------------------------------------------------------------------------
+// Chapter 9-3 Ensembling and Chapter 9-4 Bayesian approach
+// ------------------------------------------------------------------------
+// The true function that we are trying to estimate, defined on [0,1]
+torch::Tensor true_function(torch::Tensor x) {
+	torch::Tensor y = torch::exp(torch::sin(x*(2*3.1413)));
+    return y;
+}
+
+// Generate some data points with or without noise
+std::tuple<torch::Tensor, torch::Tensor> generate_data(int n_data, float sigma_y) {
+    // Generate x values quasi uniformly
+	torch::Tensor x = torch::ones({n_data});
+    for(auto& i : range(n_data, 0)) {
+        x[i].uniform_(i*1.0/n_data, (i+1)*1.0/n_data);// = torch::randn(i/n_data, (i+1)/n_data, 1)
+    }
+
+    // y value from running through function and adding noise
+    torch::Tensor y = torch::ones({n_data});
+    for(auto& i : range(n_data, 0)) {
+        y[i] = true_function(x[i]).data().item<float>();
+        y[i] += torch::normal(0, sigma_y, {1}).data().item<float>();
+    }
+    return std::make_tuple(x, y);
+}
+
+// Draw the fitted function, together with uncertainty used to generate points
+void plot_function(torch::Tensor x_func, torch::Tensor y_func, torch::Tensor x_data,
+		torch::Tensor y_data, torch::Tensor sigma_func, std::string tlt,
+		torch::Tensor x_model, torch::Tensor y_model, torch::Tensor sigma_model) {
+
+    auto F = matplot::figure(true);
+    F->size(800, 600);
+    F->reactive_mode(false);
+    F->tiledlayout(1, 1);
+    F->position(0, 0);
+
+    auto fx = F->nexttile();
+    matplot::hold(fx, true);
+    matplot::plot(fx, tensorTovector(x_func.to(torch::kDouble)),
+    		tensorTovector(y_func.to(torch::kDouble)), "k-")->line_width(2);
+
+    if( sigma_func.numel() > 0) {
+    	std::vector<double> xx, yU, yL;
+    	float sigma = sigma_func.data().item<float>();
+    	for(int i = 0; i < x_func.size(0); i++) {
+    		xx.push_back(x_func[i].data().item<float>());
+    		yL.push_back(y_func[i].data().item<float>() - 2 * sigma);
+    		yU.push_back(y_func[i].data().item<float>() + 2 * sigma);
+    	}
+    	matplot::plot(fx, xx, yU, "g--")->line_width(2);
+    	matplot::plot(fx, xx, yL, "g--")->line_width(2);
+      //ax.fill_between(x_func, y_func-2*sigma_func, y_func+2*sigma_func, color='lightgray')
+    }
+
+    if( x_data.numel() > 0) {
+    	matplot::plot(fx, tensorTovector(x_data.to(torch::kDouble)),
+    			tensorTovector(y_data.to(torch::kDouble)), "mo");
+    }
+
+    if( x_model.numel() > 0) {
+    	matplot::plot(fx, tensorTovector(x_model.to(torch::kDouble)),
+    			tensorTovector(y_model.to(torch::kDouble)), "c-")->line_width(2);
+    }
+
+    if( sigma_model.numel() > 0) {
+      //ax.fill_between(x_model, y_model-2*sigma_model, y_model+2*sigma_model, color='lightgray')
+    }
+
+    matplot::xlim(fx, {0,1});
+    matplot::xlabel(fx, "Input, x");
+    matplot::ylabel(fx, "Output, y");
+    if(tlt != "")
+    	matplot::title(fx, tlt);
+
+    matplot::show();
+}
+
+// Define model -- beta is a scalar and omega has size n_hidden,1
+torch::Tensor _network(torch::Tensor x, torch::Tensor beta, torch::Tensor omega) {
+    // Retrieve number of hidden units
+    int n_hidden = omega.size(0);
+
+	torch::Tensor y = torch::zeros_like(x);
+
+    for(auto& c_hidden : range(n_hidden, 0)) {
+        // Evaluate activations based on shifted lines (figure 8.4b-d)
+    	torch::Tensor line_vals =  x  - c_hidden*1.0/n_hidden;
+    	torch::Tensor h =  line_vals * (line_vals > 0).to(torch::kInt);
+        // Weight activations by omega parameters and sum
+        y = y + omega[c_hidden] * h;
+    }
+    // Add bias, beta
+    y = y + beta;
+
+    return y;
+}
 
