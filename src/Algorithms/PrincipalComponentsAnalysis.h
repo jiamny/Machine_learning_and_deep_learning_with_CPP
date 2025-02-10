@@ -45,7 +45,7 @@ public:
 
     	torch::Tensor eigvals, eigvectors;
         // 对协方差矩阵进行特征值分解
-        std::tie(eigvals, eigvectors) = torch::linalg::eig(covariance_matrix);
+        std::tie(eigvals, eigvectors) = torch::linalg_eig(covariance_matrix);
         eigvals = eigvals.to(torch::kDouble);
         eigvectors = eigvectors.to(torch::kDouble);
         auto idx = eigvals.argsort(-1, true);

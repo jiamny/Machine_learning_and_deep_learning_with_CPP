@@ -1,7 +1,7 @@
 /*
- * C8_1_MNIST_1D_Performance.cpp
+ * C10_2_Convolution_for_MNIST1D.cpp
  *
- *  Created on: Dec 19, 2024
+ *  Created on: Jan 21, 2025
  *      Author: jiamny
  */
 
@@ -20,7 +20,6 @@ using torch::indexing::None;
 #include <matplot/matplot.h>
 using namespace matplot;
 
-
 // Initialization of weights
 void weights_init(torch::nn::Sequential& modules){
 	for(auto& module : modules->modules((/*include_self=*/false))) {
@@ -34,7 +33,6 @@ void weights_init(torch::nn::Sequential& modules){
 		}
 	}
 }
-
 
 int main() {
 
@@ -51,30 +49,50 @@ int main() {
 	std::cout << "// ------------------------------------------------------------------------\n";
 	torch::Tensor X_train, y_train;
 	std::tie(X_train, y_train) = load_mnist1d();
-	X_train = X_train.to(torch::kFloat32);
+	X_train = X_train.to(torch::kFloat32).t();
 	y_train = y_train.to(torch::kInt64);
 
 	torch::Tensor X_test, y_test;
 	std::tie(X_test, y_test) = load_mnist1d(false);
-	X_test = X_test.to(torch::kFloat32);
+	X_test = X_test.to(torch::kFloat32).t();
 	y_test = y_test.to(torch::kInt64);
 
-	std::cout << X_train.index({Slice(0,10), Slice()}) << '\n' << y_test.index({Slice(0,10)})  << '\n';
+	std::cout << "Examples in training set: " << y_train.size(0) << '\n'
+			  << "Examples in test set:" << y_test.size(0)  << '\n'
+			  << "Length of each example: " << X_train.size(1) << '\n';
+	// Print out sizes
+	printf("Train data: %d examples (columns), each of which has %d dimensions (rows)\n",
+			int(X_train.size(1)), int(X_train.size(0)));
+	printf("Validation data: %d examples (columns), each of which has %d dimensions (rows)\n",
+			int(X_test.size(1)), int(X_test.size(0)));
 
-	int D_i = 40;    // Input dimensions
-	int D_k = 100;   // Hidden dimensions
-	int D_o = 10;    // Output dimensions
+	// The inputs correspond to the 40 offsets in the MNIST1D template.
+	int D_i = 40;
+	// The outputs correspond to the 10 digits
+	int D_o = 10;
 
-	// Define a model with two hidden layers of size 100
-	// And ReLU activations between them
-	// Replace this line (see Figure 7.8 of book for help):
-
+	/*
+	 # 1. Convolutional layer, (input=length 40 and 1 channel, kernel size 3, stride 2, padding="valid", 15 output channels )
+	 # 2. ReLU
+	 # 3. Convolutional layer, (input=length 19 and 15 channels, kernel size 3, stride 2, padding="valid", 15 output channels )
+	 # 4. ReLU
+	 # 5. Convolutional layer, (input=length 9 and 15 channels, kernel size 3, stride 2, padding="valid", 15 output channels)
+	 # 6. ReLU
+	 # 7. Flatten (converts 4x15) to length 60
+	 # 8. Linear layer (input size = 60, output size = 10)
+	 */
 	torch::nn::Sequential model = torch::nn::Sequential(
-			torch::nn::Linear(torch::nn::LinearOptions(D_i, D_k)),
+			torch::nn::Conv1d(torch::nn::Conv1dOptions(1, 15, 3).stride(2).padding(0)),
 			torch::nn::ReLU(),
-			torch::nn::Linear(torch::nn::LinearOptions(D_k, D_k)),
+			torch::nn::Conv1d(torch::nn::Conv1dOptions(15, 15, 3).stride(2).padding(0)),
 			torch::nn::ReLU(),
-			torch::nn::Linear(torch::nn::LinearOptions(D_k, D_o)));
+			torch::nn::Conv1d(torch::nn::Conv1dOptions(15, 15, 3).stride(2).padding(0)),
+			torch::nn::ReLU(),
+			torch::nn::Flatten(),
+			torch::nn::Linear(torch::nn::LinearOptions(60, D_o)));
+
+	torch::Tensor x = torch::randn({100, 1, 40});
+	std::cout << model->forward(x).sizes() << '\n';
 
 	weights_init(model);
 	model->to(device);
@@ -86,7 +104,7 @@ int main() {
 	auto optimizer = torch::optim::SGD(model->parameters(), torch::optim::SGDOptions(0.05).momentum(0.9));
 
 	// object that decreases learning rate by half every 10 epochs
-	auto scheduler = torch::optim::StepLR(optimizer, 10, 0.5);
+	auto scheduler = torch::optim::StepLR(optimizer, 20, 0.5);
 
 	// loop over the dataset n_epoch times
 	int n_epoch = 100;
@@ -95,26 +113,48 @@ int main() {
 	std::vector<double> losses_train, errors_train, losses_test, errors_test, xx;
 
 	int batch_size = 100;
-	auto dataset = LRdataset(X_train, y_train).map(torch::data::transforms::Stack<>());
+	auto dataset = LRdataset(X_train.t(), y_train).map(torch::data::transforms::Stack<>());
 	auto data_loader = torch::data::make_data_loader<torch::data::samplers::RandomSampler>(
             std::move(dataset), batch_size);
 
-	auto dataset_ts = LRdataset(X_test, y_test).map(torch::data::transforms::Stack<>());
+	auto dataset_ts = LRdataset(X_test.t(), y_test).map(torch::data::transforms::Stack<>());
 	auto test_loader = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(
             std::move(dataset_ts), batch_size);
-
 /*
 	auto batch = *data_loader->begin();
 	auto data  = batch.data.to(device);
+	data = data.unsqueeze(1);
+	std::cout << "data: " << data.dtype() << " " << data.sizes() << std::endl;
 	auto y  = batch.target.flatten().to(device);
 	std::cout << "y: " << y.dtype() << " " << y.sizes() << std::endl;
-
 	auto y_hat = model->forward(data);
-	std::cout << "y_hat: " << y_hat << std::endl;
+	std::cout << "y_hat: " << y_hat.sizes() << std::endl;
+	std::cout << "y:\n" << '\n';
+	std::vector<int> yy;
+	int n = y.size(0);
+	for(auto& i : range(n, 0)) {
+		yy.push_back(y[i].data().item<int>());
+	}
+	printVector(yy);
+	std::optional<long int> d = {1};
+	torch::Tensor p1 = torch::argmax(torch::nn::functional::log_softmax(y_hat, 1), d);
+	std::cout << "y_pred:\n" << '\n';
+	yy.clear();
+	for(auto& i : range(n, 0)) {
+		yy.push_back(p1[i].data().item<int>());
+	}
+	printVector(yy);
+	std::cout << "y_pred2:\n" << '\n';
+	torch::Tensor p2 = torch::argmax(torch::sigmoid(y_hat), d);
+	yy.clear();
+	for(auto& i : range(n, 0)) {
+		yy.push_back(p2[i].data().item<int>());
+	}
+	printVector(yy);
+
 	auto l = loss_function(y_hat, y);
 	std::cout << l.item<float>() * data.size(0) << std::endl;
 */
-
 	for(auto& epoch : range(n_epoch, 1)) {
 		double tr_error = 0., ts_error =0.;
 		double tr_ls = 0., ts_ls = 0.;
@@ -126,6 +166,7 @@ int main() {
 		    // retrieve inputs and labels for this batch
 			auto x_batch = batch.data.to(device);;
 			auto y_batch = batch.target.flatten().to(device);
+			x_batch = x_batch.unsqueeze(1);
 
 		    // zero the parameter gradients
 		    optimizer.zero_grad();
@@ -160,6 +201,7 @@ int main() {
 			// retrieve inputs and labels for this batch
 			auto x_batch = batch.data.to(device);
 			auto y_batch = batch.target.flatten().to(device);
+			x_batch = x_batch.unsqueeze(1);
 			auto pred = model->forward(x_batch);
 
 			// compute the loss
@@ -208,6 +250,7 @@ int main() {
 	std::cout << "Done!\n";
 	return 0;
 }
+
 
 
 

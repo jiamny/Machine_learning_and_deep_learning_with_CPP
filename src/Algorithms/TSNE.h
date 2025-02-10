@@ -158,7 +158,7 @@ public:
 	    X = X - torch::tile(t, {n, 1});
 	    torch::Tensor A = torch::mm(X.t(), X);
 	    torch::Tensor l, M;
-	    std::tie(l, M) = torch::linalg::eig(A);
+	    std::tie(l, M) = torch::linalg_eig(A);
 
 	    l = l.to(X.dtype());
 	    M = M.to(X.dtype());

@@ -47,7 +47,7 @@ std::tuple<torch::Tensor, torch::Tensor> fit_model_closed_form(torch::Tensor x, 
   regMat[0][0] = 0;
 
   torch::Tensor ATA = torch::matmul(A.t(), A) + regMat;
-  torch::Tensor ATAInv = torch::linalg::inv(ATA);
+  torch::Tensor ATAInv = torch::linalg_inv(ATA);
   torch::Tensor ATAInvAT = torch::matmul(ATAInv, A.t());
   torch::Tensor beta_omega = torch::matmul(ATAInvAT, y);
   torch::Tensor beta = beta_omega[0];

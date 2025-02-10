@@ -174,7 +174,7 @@ std::tuple<torch::Tensor, torch::Tensor> fit_model_closed_form(torch::Tensor x, 
 	torch::Tensor beta_omega, t_1, t_2, t_3;
 	std::optional<double> rc = {};
 	std::optional<c10::basic_string_view<char>>  d = {"gelsy"}; // 'gelsy’ 用于 CPU 输入， ‘gels’ 用于 CUDA 输入
-	std::tie(beta_omega, t_1, t_2, t_3) = torch::linalg::lstsq(A, y, rc, d); //[0]
+	std::tie(beta_omega, t_1, t_2, t_3) = torch::linalg_lstsq(A, y, rc, d); //[0]
 
 	torch::Tensor beta = beta_omega[0];
 	torch::Tensor omega = beta_omega.index({Slice(1, None)});

@@ -103,7 +103,7 @@ torch::Tensor _frequency_counter(std::vector<std::vector<std::string>> text, std
 std::vector<std::string> do_lsa(torch::Tensor X, int64_t k, std::vector<std::string> words) {
 
 	torch::Tensor w, v, sort_inds, _;
-    std::tie(w, v) = torch::linalg::eig(torch::matmul(X.t(), X));  // 计算Sx的特征值和特征向量，其中Sx=X.T*X，Sx的特征值w即为X的奇异值分解的奇异值，v即为对应的奇异向量
+    std::tie(w, v) = torch::linalg_eig(torch::matmul(X.t(), X));  // 计算Sx的特征值和特征向量，其中Sx=X.T*X，Sx的特征值w即为X的奇异值分解的奇异值，v即为对应的奇异向量
     w = w.to(X.dtype());
     v = v.to(X.dtype());
 

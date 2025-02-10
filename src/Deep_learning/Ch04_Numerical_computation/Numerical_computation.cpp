@@ -54,7 +54,7 @@ torch::Tensor gradient_decent(torch::Tensor x, torch::Tensor A, torch::Tensor b,
 }
 
 torch::Tensor newton(torch::Tensor x, torch::Tensor A, torch::Tensor b) {
-	torch::Tensor y = torch::linalg::inv(matmul_chain(std::vector<torch::Tensor> {A.t(), A}));
+	torch::Tensor y = torch::linalg_inv(matmul_chain(std::vector<torch::Tensor> {A.t(), A}));
 	x = matmul_chain(std::vector<torch::Tensor> {y, A.t(), b});
 	return x;
 }
@@ -67,7 +67,7 @@ torch::Tensor Constrained_optimization(torch::Tensor x, torch::Tensor A, torch::
 	while(torch::abs(torch::matmul(x.t(), x)-1.0).data().item<double>() > delta ) { // delta 设为 5e-2，最优设为 0
 		auto y = matmul_chain(std::vector<torch::Tensor> {A.t(), A});
 		x = matmul_chain(std::vector<torch::Tensor> {
-				torch::linalg::inv(y+2.0*lamb*torch::eye(k)), A.t(), b});
+				torch::linalg_inv(y+2.0*lamb*torch::eye(k)), A.t(), b});
 		lamb += torch::matmul(x.t(), x)-1.0;
 
 		if( cnt % 100000 == 0 ) {

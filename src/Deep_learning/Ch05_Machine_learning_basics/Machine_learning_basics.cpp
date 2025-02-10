@@ -48,7 +48,7 @@ int main() {
 	torch::Tensor y = torch::tensor({-0.2,0.1,-1.25,-1.2,0.0,0.5,-0.1,0.2,0.5,1.2}).reshape({-1,1});
 
 	//# 用公式求权重
-	torch::Tensor w = torch::linalg::inv(X.t().matmul(X)).matmul(X.t()).matmul(y);
+	torch::Tensor w = torch::linalg_inv(X.t().matmul(X)).matmul(X.t()).matmul(y);
 	torch::Tensor hat_y = X.matmul(w);
 	std::cout << "Weight:\n" << w << '\n';
 

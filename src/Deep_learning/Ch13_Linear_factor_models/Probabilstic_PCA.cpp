@@ -52,7 +52,7 @@ public:
 
     void _update_X(torch::Tensor Y, int N, int D) {
     	c10::OptionalArrayRef<long int> dim = {2};
-        sigx = torch::linalg::inv(torch::eye(D).to(torch::kFloat32) + e_tau * torch::sum(e_wwt, dim));
+        sigx = torch::linalg_inv(torch::eye(D).to(torch::kFloat32) + e_tau * torch::sum(e_wwt, dim));
 
         for(auto& n : range(N, 0)) {
         	c10::OptionalArrayRef<long int> axis = {0};
@@ -68,7 +68,7 @@ public:
 
     void _update_W(torch::Tensor Y, int M, int D) {
     	c10::OptionalArrayRef<long int> axis = {2};
-        sigw = torch::linalg::inv(torch::eye(D).to(torch::kFloat32) + e_tau * torch::sum(e_XXt, axis));
+        sigw = torch::linalg_inv(torch::eye(D).to(torch::kFloat32) + e_tau * torch::sum(e_XXt, axis));
 
         for(auto& m : range(M, 0)) {
         	c10::OptionalArrayRef<long int> dim = {0};
@@ -109,7 +109,7 @@ public:
             LB = LB + (-(D * 0.5) * std::log(2 * M_PI) - 0.5 * (
                         torch::trace(sigx) + dt.mm(dt.t())[0][0]).data().item<double>());
             LB = LB - (-(D * 0.5) * std::log(2 * M_PI) -
-            		  0.5 * torch::log(torch::linalg::det(sigx)).data().item<double>() - 0.5 * D);
+            		  0.5 * torch::log(torch::linalg_det(sigx)).data().item<double>() - 0.5 * D);
         }
 
         for(auto& m : range(M, 0)) {
@@ -117,7 +117,7 @@ public:
             LB = LB + (-(D * 0.5) * std::log(2 * M_PI) - 0.5 * (
                         torch::trace(sigw) + dt.mm(dt.t())[0][0]).data().item<double>());
             LB = LB - (-(D * 0.5) * std::log(2 * M_PI) -
-            		  0.5 * torch::log(torch::linalg::det(sigw)).data().item<double>() - 0.5 * D);
+            		  0.5 * torch::log(torch::linalg_det(sigw)).data().item<double>() - 0.5 * D);
         }
 
         double outer_expect = 0;

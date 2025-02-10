@@ -100,7 +100,7 @@ torch::Tensor page_rank_algebra_method(torch::Tensor M, double d=0.8) {
     int n_components = M.size(0);
 
     // 计算第一项：(I-dM)^-1
-    torch::Tensor r1 = torch::linalg::inv(torch::eye(n_components).to(torch::kDouble) - d * M);
+    torch::Tensor r1 = torch::linalg_inv(torch::eye(n_components).to(torch::kDouble) - d * M);
 
     // 计算第二项：(1-d)/n 1
     torch::Tensor r2 = torch::ones({n_components, 1}, torch::kDouble)*((1 - d) / n_components);

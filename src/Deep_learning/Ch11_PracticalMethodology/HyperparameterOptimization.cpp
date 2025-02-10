@@ -118,7 +118,7 @@ public:
 		torch::Tensor K_star_star = kernel._kernel(X_star, X_star);
 		torch::Tensor sig = torch::eye(K.size(0)).to(torch::kDouble) * sigma;
 
-		torch::Tensor K_y_inv = torch::linalg::pinv(K + sig);
+		torch::Tensor K_y_inv = torch::linalg_pinv(K + sig);
 		torch::Tensor mean = K_star.mm(K_y_inv).mm(y);
 		torch::Tensor cov = K_star_star - K_star.mm(K_y_inv).mm(K_star.t());
 
@@ -213,9 +213,9 @@ int main() {
 	torch::Tensor K_star = k(x, x_star);
 	torch::Tensor K_star_star = k(x_star, x_star);
 	y = y.reshape({y.size(0),-1});
-	torch::Tensor mu = m(x_star.unsqueeze(1)) + (K_star.t().mm(torch::linalg::pinv(K)).mm(y-m(y)));
+	torch::Tensor mu = m(x_star.unsqueeze(1)) + (K_star.t().mm(torch::linalg_pinv(K)).mm(y-m(y)));
 	printVector(tensorTovector(mu.squeeze()));
-	torch::Tensor Sigma = K_star_star - K_star.t().mm(torch::linalg::pinv(K)).mm(K_star);
+	torch::Tensor Sigma = K_star_star - K_star.t().mm(torch::linalg_pinv(K)).mm(K_star);
 	std::cout <<"mu: " << mu.sizes() << " Sigma: " << Sigma.sizes() << '\n';
 	torch::Tensor y_true = f(x_star);
 	printVector(tensorTovector(y_true));

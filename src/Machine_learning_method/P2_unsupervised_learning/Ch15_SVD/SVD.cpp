@@ -55,10 +55,10 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor> SVD(torch::Tensor A) {
 
     //然后求右奇异向量
     torch::Tensor eigv_AT_A, eigvt_AT_A;
-    std::tie(eigv_AT_A, eigvt_AT_A)= torch::linalg::eig(AT_A);
+    std::tie(eigv_AT_A, eigvt_AT_A)= torch::linalg_eig(AT_A);
 
     torch::Tensor eigv_A_AT, eigvt_A_AT;
-    std::tie(eigv_A_AT, eigvt_A_AT)= torch::linalg::eig(A_AT);
+    std::tie(eigv_A_AT, eigvt_A_AT)= torch::linalg_eig(A_AT);
 
     eigv_AT_A = eigv_AT_A.to(torch::kDouble);
     eigvt_AT_A = eigvt_AT_A.to(torch::kDouble);

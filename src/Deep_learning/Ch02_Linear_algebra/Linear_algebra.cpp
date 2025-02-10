@@ -116,10 +116,10 @@ int main() {
 		{4.0,5.0,6.0},
 		{7.0,8.0,9.0}});
 	//# 计算特征值
-	std::cout << "特征值:\n" << torch::linalg::eigvals(A) << '\n';
+	std::cout << "特征值:\n" << torch::linalg_eigvals(A) << '\n';
 	//# 计算特征值和特征向量
 	torch::Tensor eigvals, eigvectors;
-	std::tie(eigvals, eigvectors)= torch::linalg::eig(A);
+	std::tie(eigvals, eigvectors)= torch::linalg_eig(A);
 	std::cout << "特征值:\n" << eigvals << '\n';
 	std::cout << "特征向量:\n" << eigvectors << "\n\n";
 
@@ -201,7 +201,7 @@ int main() {
     std::cout << "covariance_matrix:\n" << covariance_matrix << '\n';
 
     // 对协方差矩阵进行特征值分解
-    std::tie(eigvals, eigvectors) = torch::linalg::eig(covariance_matrix);
+    std::tie(eigvals, eigvectors) = torch::linalg_eig(covariance_matrix);
     // 对特征值（特征向量）从大到小排序
     eigvals = eigvals.to(torch::kDouble);
     eigvectors = eigvectors.to(torch::kDouble);
