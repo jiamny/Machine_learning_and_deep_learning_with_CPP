@@ -3,10 +3,13 @@
 The objective of the repository is to implement different well-known machine learning and deep learning algorithms described in the following two books with easy to follow examples:
  
 - Deep learning (Author: Ian Goodfellow and Yoshua Bengio and Aaron Courville)
+<img src="https://github.com/jiamny/Machine_learning_and_deep_learning_with_CPP/blob/main/images/DLCover.jpg" width="200" height="300" alt="Deep learning" align=center>
 
 - Machine learning method (Author: Li Hang)
+<img src="https://github.com/jiamny/Machine_learning_and_deep_learning_with_CPP/blob/main/images/MLMbook.png" width="200" height="300" alt="Machine learning method" align=center>
 
 - Understanding Deep Learning (Author: Simon J.D. Prince)
+<img src="https://github.com/jiamny/Machine_learning_and_deep_learning_with_CPP/blob/main/images/UDLCover.jpg" width="200" height="300" alt="Understanding deep learning" align=center>
 
 ## Dependency
 

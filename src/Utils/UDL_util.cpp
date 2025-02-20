@@ -256,3 +256,82 @@ torch::Tensor _network(torch::Tensor x, torch::Tensor beta, torch::Tensor omega)
     return y;
 }
 
+std::vector<double> linear_cross_correlation(std::vector<double>  a, std::vector<double> v, std::string mode) {
+	int i = a.size();
+	int j = v.size();
+	int val = i - j + 1;
+	int full = i + j - 1;
+
+	std::vector<double> c(full);
+	std::vector<double> sv;
+	int g_a_idx = 0;
+	int g_v_len = j;
+	for(auto& k : range(full, 0)) {
+	    if( k < j) {
+	    	std::vector<double> s;
+	        for(int x = k; x > -1; x += -1) {
+	        	s.push_back(v[j - 1 - x]);
+	        }
+	        c[k] = 0.0;
+	        for(int idx = s.size()-1; idx > -1; idx +=-1) {
+	        	c[k] += s[idx] * a[idx];
+	        }
+
+	        if( k == (j - 1)) {
+	        	sv = s;
+	        	g_a_idx = j - 1;
+	        }
+
+	    } else {
+	        if(k < (j - 1 + val)) {
+	        	g_a_idx += 1;
+	        	c[k] = 0.0;
+	        	int a_idx = g_a_idx;
+	        	for(int idx = sv.size() - 1; idx > -1; idx += -1) {
+	        		c[k] += sv[idx] * a[a_idx];
+					a_idx -= 1;
+	        	}
+	        } else {
+	        	g_v_len -= 1;
+	        	c[k] = 0.0;
+	        	int a_idx = g_a_idx;
+	        	for(int idx = g_v_len - 1; idx > -1; idx += -1) {
+	        		c[k] += sv[idx] * a[a_idx];
+	        		a_idx -= 1;
+	        	}
+	        }
+	    }
+	}
+	int val_chunk = i;
+	int same_start = 0;
+	int d = static_cast<int>((full - i) / 2.0);
+
+	if( d > 0 ) {
+	    int m = static_cast<int>(d / 2.0);
+	    int r = d % 2;
+	    if( m > 0 ) {
+	      same_start = 2 * m;
+	      if( r > 0)
+	        same_start = 2 * m + 1;
+	    } else {
+	      same_start = 1;
+	    }
+	} else {
+	    same_start = 0;
+	}
+	int same_end = same_start + i;
+
+
+	if(mode == "same") {
+		// Extracting subvector from index
+		std::vector<double> same(c.begin() + same_start, c.begin() + same_end);
+		return same;
+	} else {
+		if(mode == "valid" ) {
+			std::vector<double> valid(c.begin() + (j - 1), c.begin() + val_chunk);
+			return valid;
+		} else {
+			return c;
+		}
+	}
+}

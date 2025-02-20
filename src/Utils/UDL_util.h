@@ -62,4 +62,9 @@ void plot_function(torch::Tensor x_func, torch::Tensor y_func, torch::Tensor x_d
 
 torch::Tensor _network(torch::Tensor x, torch::Tensor beta, torch::Tensor omega);
 
+// ------------------------------------------------------------------------
+// Chapter 11.1 linear cross correlation
+// ------------------------------------------------------------------------
+std::vector<double> linear_cross_correlation(std::vector<double>  a, std::vector<double> v, std::string="same");
+
 #endif /* SRC_UTILS_UDL_UTIL_H_ */
