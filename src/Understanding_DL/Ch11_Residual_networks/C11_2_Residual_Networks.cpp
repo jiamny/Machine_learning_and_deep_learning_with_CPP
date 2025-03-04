@@ -1,7 +1,7 @@
 /*
- * C10_2_Convolution_for_MNIST1D.cpp
+ * C11_2_Residual_Networks.cpp
  *
- *  Created on: Jan 21, 2025
+ *  Created on: Feb 19, 2025
  *      Author: jiamny
  */
 
@@ -20,9 +20,54 @@ using torch::indexing::None;
 #include <matplot/matplot.h>
 using namespace matplot;
 
+/*
+# We will adapt this model to have residual connections around the linear layers
+# This is the same model we used in practical 8.1, but we can't use the sequential
+# class for residual networks (which aren't strictly sequential).  Hence, I've rewritten
+# it as a model that inherits from a base class
+*/
+
+class ResidualNetwork : public torch::nn::Module {
+public:
+	ResidualNetwork(int input_size, int output_size, int hidden_size=100) {
+		linear1 = torch::nn::Linear(torch::nn::LinearOptions(input_size, hidden_size));
+    	linear2 = torch::nn::Linear(torch::nn::LinearOptions(hidden_size, hidden_size));
+    	linear3 = torch::nn::Linear(torch::nn::LinearOptions(hidden_size, hidden_size));
+    	linear4 = torch::nn::Linear(torch::nn::LinearOptions(hidden_size, output_size));
+    	register_module("linear1", linear1);
+    	register_module("linear2", linear2);
+    	register_module("linear3", linear3);
+    	register_module("linear4", linear4);
+    	printf("Initialized MLPBase model with %ld parameters\n", count_params());
+	}
+
+    long count_params() {
+    	long cnt = 0;
+    	for(auto& p : this->parameters())
+    		cnt += p.view({-1}).size(0);
+    	return cnt;
+    }
+
+    /*
+	# Add residual connections to this model
+	# The order of operations within each block should similar to figure 11.5b
+	# ie., linear1 first, ReLU+linear2 in first residual block, ReLU+linear3 in second residual block), linear4 at end
+	# Replace this function
+	*/
+    torch::Tensor forward(torch::Tensor x) {
+    	torch::Tensor f = linear1->forward(x);
+    	torch::Tensor res1 = f + linear2(f.relu());
+    	torch::Tensor res2 = res1 + linear3->forward(res1.relu());
+
+    	return linear4->forward(res2);
+    }
+private:
+    torch::nn::Linear linear1{nullptr}, linear2{nullptr}, linear3{nullptr}, linear4{nullptr};
+};
+
 // Initialization of weights
-void weights_init(torch::nn::Sequential& modules){
-	for(auto& module : modules->modules((/*include_self=*/false))) {
+void weights_init(ResidualNetwork& model){
+	for(auto& module : model.modules((/*include_self=*/false))) {
 		if (auto M = dynamic_cast<torch::nn::Conv2dImpl*>(module.get())) {
 		    torch::nn::init::kaiming_normal_(
 		            M->weight,
@@ -42,7 +87,7 @@ int main() {
 	// Device
 	auto cuda_available = torch::cuda::is_available();
 	torch::Device device(cuda_available ? torch::kCUDA : torch::kCPU);
-	std::cout << (cuda_available ? "CUDA available." : "Training on CPU.") << '\n';
+	std::cout << (cuda_available ? "CUDA available." : "Using CPU.") << '\n';
 
 	std::cout << "// ------------------------------------------------------------------------\n";
 	std::cout << "// Load data sets\n";
@@ -66,44 +111,31 @@ int main() {
 	printf("Validation data: %d examples (columns), each of which has %d dimensions (rows)\n",
 			int(X_test.size(1)), int(X_test.size(0)));
 
+	std::cout << "// ------------------------------------------------------------------------\n";
+	std::cout << "// Create and run the ResidualNetwork model\n";
+	std::cout << "// ------------------------------------------------------------------------\n";
 	// The inputs correspond to the 40 offsets in the MNIST1D template.
 	int D_i = 40;
 	// The outputs correspond to the 10 digits
 	int D_o = 10;
 
-	/*
-	 # 1. Convolutional layer, (input=length 40 and 1 channel, kernel size 3, stride 2, padding="valid", 15 output channels )
-	 # 2. ReLU
-	 # 3. Convolutional layer, (input=length 19 and 15 channels, kernel size 3, stride 2, padding="valid", 15 output channels )
-	 # 4. ReLU
-	 # 5. Convolutional layer, (input=length 9 and 15 channels, kernel size 3, stride 2, padding="valid", 15 output channels)
-	 # 6. ReLU
-	 # 7. Flatten (converts 4x15) to length 60
-	 # 8. Linear layer (input size = 60, output size = 10)
-	 */
-	torch::nn::Sequential model = torch::nn::Sequential(
-			torch::nn::Conv1d(torch::nn::Conv1dOptions(1, 15, 3).stride(2).padding(0)),
-			torch::nn::ReLU(),
-			torch::nn::Conv1d(torch::nn::Conv1dOptions(15, 15, 3).stride(2).padding(0)),
-			torch::nn::ReLU(),
-			torch::nn::Conv1d(torch::nn::Conv1dOptions(15, 15, 3).stride(2).padding(0)),
-			torch::nn::ReLU(),
-			torch::nn::Flatten(),
-			torch::nn::Linear(torch::nn::LinearOptions(60, D_o)));
+	// #Define the model
+	ResidualNetwork model(D_i, D_o);
 
 	torch::Tensor x = torch::randn({100, 1, 40});
-	std::cout << model->forward(x).sizes() << '\n';
+	std::cout << model.forward(x).sizes() << '\n';
 
 	weights_init(model);
-	model->to(device);
+	model.to(device);
+
 
 	// choose cross entropy loss function (equation 5.24)
 	auto loss_function = torch::nn::CrossEntropyLoss();
 
 	// construct SGD optimizer and initialize learning rate and momentum
-	auto optimizer = torch::optim::SGD(model->parameters(), torch::optim::SGDOptions(0.05).momentum(0.9));
+	auto optimizer = torch::optim::SGD(model.parameters(), torch::optim::SGDOptions(0.05).momentum(0.9));
 
-	// object that decreases learning rate by half every 10 epochs
+	// object that decreases learning rate by half every 20 epochs
 	auto scheduler = torch::optim::StepLR(optimizer, 20, 0.5);
 
 	// loop over the dataset n_epoch times
@@ -120,48 +152,15 @@ int main() {
 	auto dataset_ts = LRdataset(X_test.t(), y_test).map(torch::data::transforms::Stack<>());
 	auto test_loader = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(
             std::move(dataset_ts), batch_size);
-/*
-	auto batch = *data_loader->begin();
-	auto data  = batch.data.to(device);
-	data = data.unsqueeze(1);
-	std::cout << "data: " << data.dtype() << " " << data.sizes() << std::endl;
-	auto y  = batch.target.flatten().to(device);
-	std::cout << "y: " << y.dtype() << " " << y.sizes() << std::endl;
-	auto y_hat = model->forward(data);
-	std::cout << "y_hat: " << y_hat.sizes() << std::endl;
-	std::cout << "y:\n" << '\n';
-	std::vector<int> yy;
-	int n = y.size(0);
-	for(auto& i : range(n, 0)) {
-		yy.push_back(y[i].data().item<int>());
-	}
-	printVector(yy);
-	std::optional<long int> d = {1};
-	torch::Tensor p1 = torch::argmax(torch::nn::functional::log_softmax(y_hat, 1), d);
-	std::cout << "y_pred:\n" << '\n';
-	yy.clear();
-	for(auto& i : range(n, 0)) {
-		yy.push_back(p1[i].data().item<int>());
-	}
-	printVector(yy);
-	std::cout << "y_pred2:\n" << '\n';
-	torch::Tensor p2 = torch::argmax(torch::sigmoid(y_hat), d);
-	yy.clear();
-	for(auto& i : range(n, 0)) {
-		yy.push_back(p2[i].data().item<int>());
-	}
-	printVector(yy);
 
-	auto l = loss_function(y_hat, y);
-	std::cout << l.item<float>() * data.size(0) << std::endl;
-*/
 
 	for(auto& epoch : range(n_epoch, 1)) {
 		double tr_error = 0., ts_error =0.;
 		double tr_ls = 0., ts_ls = 0.;
 		int num_smaples = 0;
 		int correct = 0;
-		model->train();
+		model.train();
+
 		// loop over batches
 		for (auto &batch : *data_loader) {
 		    // retrieve inputs and labels for this batch
@@ -173,7 +172,7 @@ int main() {
 		    optimizer.zero_grad();
 
 		    //forward pass -- calculate model output
-		    auto pred = model->forward(x_batch);
+		    auto pred = model.forward(x_batch).squeeze(1);
 
 		    // compute the loss
 		    auto loss = loss_function(pred, y_batch);
@@ -195,7 +194,7 @@ int main() {
 		tr_error = 100. - (correct*1.0/num_smaples)*100;
 		errors_train.push_back(tr_error);
 
-		model->eval();
+		model.eval();
 		correct = 0;
 		num_smaples = 0;
 		for (auto &batch : *test_loader) {
@@ -203,7 +202,7 @@ int main() {
 			auto x_batch = batch.data.to(device);
 			auto y_batch = batch.target.flatten().to(device);
 			x_batch = x_batch.unsqueeze(1);
-			auto pred = model->forward(x_batch);
+			auto pred = model.forward(x_batch).squeeze(1);
 
 			// compute the loss
 			auto loss = loss_function(pred, y_batch);
@@ -251,8 +250,4 @@ int main() {
 	std::cout << "Done!\n";
 	return 0;
 }
-
-
-
-
 
