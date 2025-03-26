@@ -15,6 +15,7 @@
 #include <torch/autograd.h>
 #include <torch/utils.h>
 #include <limits>
+#include <cmath>
 
 using torch::indexing::Slice;
 using torch::indexing::None;
@@ -66,5 +67,10 @@ torch::Tensor _network(torch::Tensor x, torch::Tensor beta, torch::Tensor omega)
 // Chapter 11.1 linear cross correlation
 // ------------------------------------------------------------------------
 std::vector<double> linear_cross_correlation(std::vector<double>  a, std::vector<double> v, std::string="same");
+
+// ------------------------------------------------------------------------
+// Chapter 13
+// ------------------------------------------------------------------------
+std::vector<std::pair<size_t, size_t>> tensorToedges(torch::Tensor A);
 
 #endif /* SRC_UTILS_UDL_UTIL_H_ */

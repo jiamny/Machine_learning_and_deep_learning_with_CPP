@@ -35,6 +35,7 @@ torch::Tensor softmax_cols(torch::Tensor data_in) {
   return softmax;
 }
 
+
 // Now let's compute self attention in matrix form
 torch::Tensor self_attention(torch::Tensor X, torch::Tensor omega_v, torch::Tensor omega_q,
 		torch::Tensor omega_k, torch::Tensor beta_v, torch::Tensor beta_q, torch::Tensor beta_k) {

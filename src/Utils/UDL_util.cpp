@@ -335,3 +335,19 @@ std::vector<double> linear_cross_correlation(std::vector<double>  a, std::vector
 		}
 	}
 }
+
+// ------------------------------------------------------------------------
+// Chapter 13
+// ------------------------------------------------------------------------
+std::vector<std::pair<size_t, size_t>> tensorToedges(torch::Tensor A) {
+    std::vector<std::pair<size_t, size_t>> edges;
+    int R = A.size(0); int C = A.size(1);
+    for(auto& r : range(R, 0)) {
+    	for(auto& c : range(C, 0)) {
+    		if( A[r][c].data().item<int>() > 0) {
+    			edges.push_back(std::pair<size_t, size_t> {r, c});
+    		}
+    	}
+    }
+    return edges;
+}
